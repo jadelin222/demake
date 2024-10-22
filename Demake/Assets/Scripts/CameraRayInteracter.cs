@@ -1,0 +1,41 @@
+using System.Collections;
+using System.Collections.Generic;
+using System.Net;
+using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.Rendering;
+
+public class CameraRayInteracter : MonoBehaviour
+{
+
+    [Header("Raycast")]
+    RaycastHit rayHit;
+
+    [Range(0, 100)]
+    public float maxDist = 1f; // m
+    public LayerMask interactableLayer;
+
+    [Header("UI")]
+    public Image uiImage;
+    public Sprite defaultSprite;         
+    public Sprite interactableSprite;
+
+    void Update()
+    {
+        //ray go out from cam to the center of screen and out 
+        Vector3 screenCenter = new Vector3(Screen.width / 2, Screen.height / 2, 0);
+        Ray ray = Camera.main.ScreenPointToRay(screenCenter);
+
+        //switch between different sprites to indicate if obejct is interactable
+        if (Physics.Raycast(ray, out rayHit, maxDist, interactableLayer))
+        {
+            Debug.DrawLine(Camera.main.transform.position, rayHit.point, Color.red, 2f);
+            uiImage.sprite = interactableSprite;
+        }
+        else
+        {
+            //Debug.DrawLine(Camera.main.transform.position, rayHit.point, Color.green, 2f);//not working
+            uiImage.sprite = defaultSprite;
+        }
+    }
+}
