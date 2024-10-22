@@ -30,7 +30,22 @@ public class CameraRayInteracter : MonoBehaviour
         if (Physics.Raycast(ray, out rayHit, maxDist, interactableLayer))
         {
             Debug.DrawLine(Camera.main.transform.position, rayHit.point, Color.red, 2f);
-            uiImage.sprite = interactableSprite;
+            Debug.Log("raycast hit: " + rayHit.collider.name);
+
+            IInteractable interactable = rayHit.collider.GetComponent<IInteractable>();
+
+            if (interactable != null)
+            {
+                Debug.Log("interactable object hit!");
+                uiImage.sprite = interactableSprite;
+                interactable.OnRayHit();
+
+                if (Input.GetKeyDown(KeyCode.E))
+                {
+                    Debug.Log("E pressed");
+                    interactable.Interact();  
+                }
+            }
         }
         else
         {
