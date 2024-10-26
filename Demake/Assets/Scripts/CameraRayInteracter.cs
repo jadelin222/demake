@@ -26,6 +26,16 @@ public class CameraRayInteracter : MonoBehaviour
         Vector3 screenCenter = new Vector3(Screen.width / 2, Screen.height / 2, 0);
         Ray ray = Camera.main.ScreenPointToRay(screenCenter);
 
+        //tool controls
+        if (Input.GetKeyDown(KeyCode.C))  //cycle to the next tool
+        {
+            ToolSystem.Instance.CycleToNextTool();
+        }
+        if (Input.GetKeyDown(KeyCode.X))  // Use the equipped tool
+        {
+            ToolSystem.Instance.UseActiveTool();
+        }
+
         //switch between different sprites to indicate if obejct is interactable
         if (Physics.Raycast(ray, out rayHit, maxDist, interactableLayer))
         {
@@ -45,6 +55,7 @@ public class CameraRayInteracter : MonoBehaviour
                     Debug.Log("E pressed");
                     interactable.Interact();  
                 }
+
             }
         }
         else

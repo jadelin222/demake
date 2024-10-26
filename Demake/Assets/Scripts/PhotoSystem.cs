@@ -42,7 +42,7 @@ public class PhotoSystem : MonoBehaviour
 
         GameObject photoObject2 = Instantiate(photoPrefab);
         Photo photo2 = photoObject2.GetComponent<Photo>();
-        photo2.InitializePhoto(2, "Creepy Forest", sampleSprite, false, false);
+        photo2.InitializePhoto(2, "Forest", sampleSprite, false, false);
         allPhotos.Add(photo2);
 
         Debug.Log("Initialized all photos");
