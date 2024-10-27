@@ -2,14 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Shovel : MonoBehaviour, ITool
+public class Shovel : Tool
 {
-    public void UseTool()
+    public override void UseTool()
     {
         DigThings();
     }
     private void DigThings()
     {
-        Debug.Log("Plants revived!");
+        Debug.Log("im digging it!");
     }
 }

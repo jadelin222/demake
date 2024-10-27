@@ -31,7 +31,7 @@ public class CameraRayInteracter : MonoBehaviour
         {
             ToolSystem.Instance.CycleToNextTool();
         }
-        if (Input.GetKeyDown(KeyCode.X))  // Use the equipped tool
+        if (Input.GetKeyDown(KeyCode.X))  
         {
             ToolSystem.Instance.UseActiveTool();
         }

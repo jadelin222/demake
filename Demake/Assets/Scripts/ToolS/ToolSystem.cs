@@ -5,35 +5,30 @@ using UnityEngine;
 
 //manage the overall tool inventory, which tool is currently equipped
 //handle actions like equipping, unequipping, and switching between tools
-public enum ToolType
-{
-    WateringCan,
-    Scissors,
-    Shovel,
-    Trumpet
-}
+
 public class ToolSystem : MonoBehaviour
 {
     public static ToolSystem Instance;
-
-    private List<ITool> toolInventory = new List<ITool>(); 
-    private int currentToolIndex = 0; 
-    private ITool activeTool;
+    private List<Tool> toolInventory = new List<Tool>();
+    private int currentToolIndex = 0;
+    //private ITool activeTool;
+    private Tool activeTool;
 
     void Awake()
     {
         Instance = this;
     }
-
     public void CollectTool(GameObject toolObject)
     {
-        ITool tool = toolObject.GetComponent<ITool>();
+        //ITool tool = toolObject.GetComponent<ITool>();
+        Tool tool = toolObject.GetComponent<Tool>();
 
         if (tool != null && !toolInventory.Contains(tool))
         {
             toolInventory.Add(tool);  
-            Debug.Log($"{toolObject.name} collected and added to inventory.");
-            EquipTool(currentToolIndex);
+            Debug.Log($"{toolObject.name} collected and added to inventory");
+            //EquipTool(currentToolIndex);
+            EquipTool(toolInventory.Count - 1);
         }
     }
 
@@ -42,29 +37,34 @@ public class ToolSystem : MonoBehaviour
         if (toolInventory.Count == 0) return; 
 
         currentToolIndex = toolIndex % toolInventory.Count;
+
         if (activeTool != null)
         {
-            (activeTool as MonoBehaviour).gameObject.SetActive(false);
+            activeTool.gameObject.SetActive(false);
         }
 
         activeTool = toolInventory[currentToolIndex];
-        (activeTool as MonoBehaviour).gameObject.SetActive(true); 
+        //activeTool.gameObject.SetActive(true);//no working
+        activeTool.ResetToolStatus();
 
-        Debug.Log($"{(activeTool as MonoBehaviour).name} equipped");
+        Debug.Log($"{activeTool.name} equipped");
     }
-
     public void UseActiveTool()
     {
         if (activeTool != null)
         {
-            activeTool.UseTool();
+            if (!activeTool.gameObject.activeSelf)
+            {
+                activeTool.ResetToolStatus(); // show and reset the tool if it was put away
+            }
+            activeTool.ActivateTool();
+            //activeTool.UseTool();
         }
         else
         {
-            Debug.Log("no tool equipped.");
+            Debug.Log("No tool equipped");
         }
     }
-
     public void CycleToNextTool()
     {
         if (toolInventory.Count == 0) return;
