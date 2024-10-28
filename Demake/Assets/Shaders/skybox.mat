@@ -54,12 +54,12 @@ Material:
     - _QueueControl: 0
     - _QueueOffset: 0
     - _dayNightSlider: 0
-    - _horizonBlend: 30
+    - _horizonBlend: 20
     - _skyBlend: 1
     - _skyBtmBlend: 1
     m_Colors:
-    - _groundCol: {r: 0.23549305, g: 0.31971735, b: 0.33962262, a: 0}
-    - _horizonCol: {r: 0.38679248, g: 0.38679248, b: 0.38679248, a: 0}
-    - _nightSkyCol: {r: 0.41509432, g: 0.23691703, b: 0.29291552, a: 0}
-    - _skyCol: {r: 0.8160377, g: 0.96997696, b: 1, a: 0}
+    - _groundCol: {r: 0.08076716, g: 0.13026087, b: 0.14150941, a: 0}
+    - _horizonCol: {r: 0.735849, g: 0.64705884, b: 0.6910419, a: 0}
+    - _nightSkyCol: {r: 0.23584908, g: 0.107912086, b: 0.14963068, a: 0}
+    - _skyCol: {r: 0.87058824, g: 0.99871933, b: 1, a: 0}
   m_BuildTextureStacks: []
