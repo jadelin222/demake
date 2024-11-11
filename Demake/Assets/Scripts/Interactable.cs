@@ -2,6 +2,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum ToolType
+{
+    None,
+    Shovel,
+    Hammer,
+    WateringCan,
+    Trumpet
+
+}
+
 public abstract class Interactable : MonoBehaviour
 {
     public bool isCollectable;

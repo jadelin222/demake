@@ -10,7 +10,6 @@ public class Dooor : MonoBehaviour, IInteractable
 
     //private PlayerInventory playerInventory;
 
-    // Called when interacting with the door
     public void Interact()
     {
         Debug.Log("interact with door");
@@ -45,7 +44,7 @@ public class Dooor : MonoBehaviour, IInteractable
 
     }
 
-    // Called when the player looks at the door
+    //called when the player looks at the door
     public void OnRayHit()
     {
         Debug.Log("looking at door");
