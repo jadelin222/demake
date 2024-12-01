@@ -11,9 +11,12 @@ using UnityEngine;
 //    Trumpet
 
 //}
+//abstract tool class
 public abstract class Tool : MonoBehaviour
 {
     public string toolName;
+    public ItemType ToolType;
+
     public float maxIdleTime = 5f;
     public float coolDownTime = 1f;
     private float lastUseTime;
@@ -58,6 +61,7 @@ public abstract class Tool : MonoBehaviour
     }
     public bool CanUse()
     {
+        //td: add condition to use on correct object?
         return Time.time >= lastUseTime + coolDownTime;
     }
 
@@ -70,7 +74,7 @@ public abstract class Tool : MonoBehaviour
     }
     protected virtual void PlayHideAnim()
     {
-        //td: use lerp to make it hide away
+        //td: use animation
         //transform.localPosition += Vector3.down * 100;
         Debug.Log("hide anim played");
 

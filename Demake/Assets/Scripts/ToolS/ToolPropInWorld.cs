@@ -2,10 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+//a prop in the game to pickup, it is an interactable, when picked up, add the corresponding object to the inventory.
 public class ToolPropInWorld : MonoBehaviour, IInteractable
 {
     //public ToolType toolType; 
     public GameObject toolObject;
+    public ItemType RequiredItem => ItemType.None;
     public void Interact()
     {
         if (toolObject == null)
@@ -23,6 +25,7 @@ public class ToolPropInWorld : MonoBehaviour, IInteractable
     public void OnRayHit()
     {
         Debug.Log($"Looking at {toolObject.name}");
+        //prompt ui to show control hint
     }
 
 }

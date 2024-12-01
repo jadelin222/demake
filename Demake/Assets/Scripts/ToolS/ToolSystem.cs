@@ -9,11 +9,14 @@ using UnityEngine;
 public class ToolSystem : MonoBehaviour
 {
     public static ToolSystem Instance;
+
     private List<Tool> toolInventory = new List<Tool>();
     private int currentToolIndex = 0;
     //private ITool activeTool;
     private Tool activeTool;
+    private ItemType equippedItem = ItemType.None; //currently equipped item
 
+    public ItemType EquippedToolType => equippedItem;
     void Awake()
     {
         Instance = this;
@@ -44,13 +47,42 @@ public class ToolSystem : MonoBehaviour
         }
 
         activeTool = toolInventory[currentToolIndex];
-        //activeTool.gameObject.SetActive(true);//no working
+        equippedItem = activeTool.ToolType;  //update current equipped tool
         activeTool.ResetToolStatus();
-
-        Debug.Log($"{activeTool.name} equipped");
+        Debug.Log($"{activeTool.ToolType} equipped");
+        //Debug.Log($"{activeTool.name} equipped");
     }
     public void UseActiveTool()
     {
+        //if (interactable == null)
+        //{
+        //    Debug.Log("no interactable object detected");
+        //    return;
+        //}
+
+        //ItemType requiredItem = interactable.RequiredItem;
+
+        ////case 1:equipped tool = required item
+        //if (ToolSystem.Instance.EquippedToolType == requiredItem)
+        //{
+        //    Debug.Log($"Using equipped tool ({ToolSystem.Instance.EquippedToolType}) on {interactable}.");
+        //    activeTool?.ActivateTool(); // Perform tool action
+        //    interactable.Interact();   // Trigger interactable action
+        //}
+        ////case 2: the interactable only requires possession of the item
+        //else if (ToolSystem.Instance.HasItem(requiredItem))
+        //{
+        //    Debug.Log($"Using possessed item ({requiredItem}) on {interactable}.");
+        //    interactable.Interact(); // Perform interactable action
+        //}
+        //// case 3: Neither equipped nor possessed item matches the required item
+        //else
+        //{
+        //    Debug.Log($"You need a {requiredItem} to interact with this.");
+        //    //td ui prompt
+        //}
+
+
         if (activeTool != null)
         {
             if (!activeTool.gameObject.activeSelf)
@@ -63,6 +95,7 @@ public class ToolSystem : MonoBehaviour
         else
         {
             Debug.Log("No tool equipped");
+            return;
         }
     }
     public void CycleToNextTool()

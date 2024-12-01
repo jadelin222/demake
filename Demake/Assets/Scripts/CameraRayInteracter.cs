@@ -53,15 +53,30 @@ public class CameraRayInteracter : MonoBehaviour
                 if (Input.GetKeyDown(KeyCode.E))
                 {
                     Debug.Log("E pressed");
-                    interactable.Interact();  
-                }
+                    //interactable.Interact();  
+                    HandleInteraction(interactable);
 
+                }
             }
         }
         else
         {
             //Debug.DrawLine(Camera.main.transform.position, rayHit.point, Color.green, 2f);//not working
             uiImage.sprite = defaultSprite;
+        }
+    }
+    private void HandleInteraction(IInteractable interactable)
+    {
+        ItemType requiredItem = interactable.RequiredItem;
+        //not working properlly need to fix
+        if (requiredItem == ItemType.None || requiredItem == ToolSystem.Instance.EquippedToolType)
+        {
+            interactable.Interact();
+        }
+        else
+        {
+            //td: prompt ui
+            Debug.Log($"you need a {requiredItem} to interact with this");
         }
     }
 }

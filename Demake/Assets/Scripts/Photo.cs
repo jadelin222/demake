@@ -10,7 +10,7 @@ public class Photo : MonoBehaviour, IInteractable
     public bool isPuzzleSolved = false;
     public bool isCollected = false;
 
-
+    public ItemType RequiredItem => ItemType.None;
     private PhotoSystem photoSystem;
 
     public void InitializePhoto(int num, string name, Sprite img, bool puzzleSolved, bool collected)

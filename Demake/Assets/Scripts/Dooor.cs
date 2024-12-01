@@ -6,7 +6,8 @@ public class Dooor : MonoBehaviour, IInteractable
 {
     public bool isOpen = false;
     public bool isKeyNeeded;
-    public string requiredKeyName;
+    //public string requiredKeyName;
+    public ItemType RequiredItem => ItemType.KeyToA;//to change to drop down menu or?
 
     //private PlayerInventory playerInventory;
 
