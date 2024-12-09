@@ -6,6 +6,7 @@ using UnityEngine;
 public class ToolPickUp : PickUp
 {
     public GameObject toolObject;
+    public override string InteractionVerb => "Pickup";
     public override void Interact()
     {
         if (toolObject == null)

@@ -12,13 +12,14 @@ public class CameraRayInteracter : MonoBehaviour
     RaycastHit rayHit;
 
     [Range(0, 100)]
-    public float maxDist = 1f; // m
+    public float maxDist = 1.2f; // m
     public LayerMask interactableLayer;
 
     [Header("UI")]
     public Image uiImage;
     public Sprite defaultSprite;         
     public Sprite interactableSprite;
+
 
     void Update()
     {
@@ -27,11 +28,11 @@ public class CameraRayInteracter : MonoBehaviour
         Ray ray = Camera.main.ScreenPointToRay(screenCenter);
 
         //tool controls
-        if (Input.GetKeyDown(KeyCode.C))  //cycle to the next tool
+        if (Input.GetKeyDown(KeyCode.C) || Input.GetMouseButtonDown(1))  //cycle to the next tool
         {
             ToolSystem.Instance.CycleToNextTool();
         }
-        if (Input.GetKeyDown(KeyCode.E))  
+        if (Input.GetKeyDown(KeyCode.E) || Input.GetMouseButtonDown(0))  
         {
             ToolSystem.Instance.UseActiveTool();
         }
@@ -50,8 +51,8 @@ public class CameraRayInteracter : MonoBehaviour
                 Debug.Log("interactable object hit!");
                 uiImage.sprite = interactableSprite;
                 interactable.OnRayHit();
-
-                if (Input.GetKeyDown(KeyCode.E))
+                 
+                if (Input.GetKeyDown(KeyCode.E) || Input.GetMouseButtonDown(0))
                 {
                     Debug.Log("E pressed");
                     //interactable.Interact();  
@@ -64,6 +65,7 @@ public class CameraRayInteracter : MonoBehaviour
         {
             //Debug.DrawLine(Camera.main.transform.position, rayHit.point, Color.green, 2f);//not working
             uiImage.sprite = defaultSprite;
+            UIManager.Instance.HideControlHintUI();
         }
     }
     private void HandleInteraction(IInteractable interactable)

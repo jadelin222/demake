@@ -7,6 +7,7 @@ public class Breakable : MonoBehaviour, IInteractable
     public GameObject fullObject;
     public GameObject fragments;
     public ItemType RequiredItem => ItemType.Hammer;
+    public string InteractionVerb => "Break";
 
     private bool isBroken = false;  // To track if the object is already broken
     public void Interact()

@@ -54,35 +54,6 @@ public class ToolSystem : MonoBehaviour
     }
     public void UseActiveTool()
     {
-        //if (interactable == null)
-        //{
-        //    Debug.Log("no interactable object detected");
-        //    return;
-        //}
-
-        //ItemType requiredItem = interactable.RequiredItem;
-
-        ////case 1:equipped tool = required item
-        //if (ToolSystem.Instance.EquippedToolType == requiredItem)
-        //{
-        //    Debug.Log($"Using equipped tool ({ToolSystem.Instance.EquippedToolType}) on {interactable}.");
-        //    activeTool?.ActivateTool(); // Perform tool action
-        //    interactable.Interact();   // Trigger interactable action
-        //}
-        ////case 2: the interactable only requires possession of the item
-        //else if (ToolSystem.Instance.HasItem(requiredItem))
-        //{
-        //    Debug.Log($"Using possessed item ({requiredItem}) on {interactable}.");
-        //    interactable.Interact(); // Perform interactable action
-        //}
-        //// case 3: Neither equipped nor possessed item matches the required item
-        //else
-        //{
-        //    Debug.Log($"You need a {requiredItem} to interact with this.");
-        //    //td ui prompt
-        //}
-
-
         if (activeTool != null)
         {
             if (!activeTool.gameObject.activeSelf)

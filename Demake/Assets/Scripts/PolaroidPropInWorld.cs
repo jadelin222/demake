@@ -5,6 +5,7 @@ using UnityEngine;
 public class PolaroidPropInWorld : MonoBehaviour, IInteractable
 {
     public ItemType RequiredItem => ItemType.None;
+    public string InteractionVerb => "Inspect";
     public void Interact()
     {
        //match which polaroid this is 

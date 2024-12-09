@@ -7,6 +7,7 @@ public class ToolPropInWorld : MonoBehaviour, IInteractable
 {
     public GameObject toolObject;
     public ItemType RequiredItem => ItemType.None;
+    public string InteractionVerb => "Pickup";
     public void Interact()
     {
         if (toolObject == null)
@@ -24,7 +25,7 @@ public class ToolPropInWorld : MonoBehaviour, IInteractable
     public void OnRayHit()
     {
         Debug.Log($"Looking at {toolObject.name}");
-        //prompt ui to show control hint
+        UIManager.Instance.ShowControlHintUI(InteractionVerb);
     }
 
 }

@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class PolaroidPickUp : PickUp
 {
+    public override string InteractionVerb => "Inspect";
     public override void Interact()
     {
         Debug.Log($"picked up polaroid number x");

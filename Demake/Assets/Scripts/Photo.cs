@@ -11,6 +11,7 @@ public class Photo : MonoBehaviour, IInteractable
     public bool isCollected = false;
 
     public ItemType RequiredItem => ItemType.None;
+    public string InteractionVerb => "Inspect";
     private PhotoSystem photoSystem;
 
     public void InitializePhoto(int num, string name, Sprite img, bool puzzleSolved, bool collected)

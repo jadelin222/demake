@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class ItemPickUp : PickUp
 {
+    public override string InteractionVerb => "Pickup";
     public override void Interact()
     {
         Debug.Log($"picked up item: {itemName}");
