@@ -417,6 +417,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 248175867093098261}
+  - component: {fileID: 1419634042920371252}
   m_Layer: 11
   m_Name: Polaroid prop
   m_TagString: Untagged
@@ -440,3 +441,17 @@ Transform:
   - {fileID: 3434295461092143953}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1419634042920371252
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4213158992230212495}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c5ea48011f26274fa6ad0c5066e8b1e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemName: Polaroid
+  itemSprite: {fileID: 0}

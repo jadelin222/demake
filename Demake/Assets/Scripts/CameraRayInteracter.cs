@@ -31,7 +31,7 @@ public class CameraRayInteracter : MonoBehaviour
         {
             ToolSystem.Instance.CycleToNextTool();
         }
-        if (Input.GetKeyDown(KeyCode.X))  
+        if (Input.GetKeyDown(KeyCode.E))  
         {
             ToolSystem.Instance.UseActiveTool();
         }
@@ -42,7 +42,8 @@ public class CameraRayInteracter : MonoBehaviour
             Debug.DrawLine(Camera.main.transform.position, rayHit.point, Color.red, 2f);
             Debug.Log("raycast hit: " + rayHit.collider.name);
 
-            IInteractable interactable = rayHit.collider.GetComponent<IInteractable>();
+            //IInteractable interactable = rayHit.collider.GetComponent<IInteractable>();
+            IInteractable interactable = rayHit.collider.GetComponentInParent<IInteractable>();  //detact also the child objects' collider
 
             if (interactable != null)
             {
@@ -68,7 +69,7 @@ public class CameraRayInteracter : MonoBehaviour
     private void HandleInteraction(IInteractable interactable)
     {
         ItemType requiredItem = interactable.RequiredItem;
-        //not working properlly need to fix
+        //check if the game object in world need certain item to be interacted with. or if it's tool, tool need to be equipped when interacting
         if (requiredItem == ItemType.None || requiredItem == ToolSystem.Instance.EquippedToolType)
         {
             interactable.Interact();

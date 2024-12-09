@@ -5,7 +5,6 @@ using UnityEngine;
 //a prop in the game to pickup, it is an interactable, when picked up, add the corresponding object to the inventory.
 public class ToolPropInWorld : MonoBehaviour, IInteractable
 {
-    //public ToolType toolType; 
     public GameObject toolObject;
     public ItemType RequiredItem => ItemType.None;
     public void Interact()
