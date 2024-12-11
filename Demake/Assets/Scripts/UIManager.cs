@@ -21,17 +21,20 @@ public class UIManager : MonoBehaviour
     public GameObject bottomScreenUI;
     public TMP_Text bottomScreenText;
 
-    [Header("Full Screen UI")]
-    public GameObject fullScreenUI;
-
     [Header("Time UI")]
     [SerializeField] public TMP_Text timeTxt;
     [SerializeField] private GameTime gameTime;
 
-    [Header("Ray Interation UI")]
-    public Image uiImage;
+    [Header("Ray Interation Cursor UI")]
+    public GameObject CursorUI;
+    public Image cursorImage;
     public Sprite defaultSprite;
     public Sprite interactableSprite;
+
+    public MonoBehaviour cameraController;
+    private GameObject pendingItem;
+    private bool isPickUpUIActive = false;
+
 
     void Awake()
     {
@@ -55,18 +58,20 @@ public class UIManager : MonoBehaviour
     {
         //with type writer fx
     }
-    public void ShowFullScreenUI()
-    {
-
-    }
+    //public void ShowPickupUI(string actionVerb, string bottomMessage, GameObject item)
     public void ShowPickupUI(string actionVerb, string bottomMessage)
     {
         //show control hint
+        CursorUI.SetActive(false);
         colsePanellHintUI.SetActive(true);
         closeHintText.text = $"Q - {actionVerb}";
 
         pickUpMaskUI.SetActive(true);
         bottomLeftMessage.text = bottomMessage;
+
+        //store pending item reference
+        //pendingItem = item;
+        FreezeCamera();
 
         //later for displaying letters/texts/polaroid? 
         //if (blackBackground != null)
@@ -74,14 +79,32 @@ public class UIManager : MonoBehaviour
     }
     public void HidePickupUI()
     {
-        HideControlHintUI();       
+        HideControlHintUI();
+        CursorUI.SetActive(true);
         pickUpMaskUI.SetActive(false);
         colsePanellHintUI.SetActive(false);
+
+        if (pendingItem != null)
+        {
+            ToolSystem.Instance.CollectTool(pendingItem);
+            Destroy(pendingItem);
+            pendingItem = null;
+        }
+
+        ResumeCamera();
+
 
         //if (blackBackground != null)
         //    blackBackground.SetActive(false);
     }
+    public void ShowLetterUI()
+    {
 
+    }
+    public void ShowPolaroidUI()
+    {
+
+    }
     public void ShowControlHintUI(string actionVerb)
     {
         controlHintUI.SetActive(true);
@@ -93,15 +116,38 @@ public class UIManager : MonoBehaviour
     }
 
     /// <summary>
-    /// interactable item when hit by ray will change the UI in the middle of the screen
+    /// interactable item when hit by ray will change the cursor UI at the center of the screen
     /// </summary>
     public void HideInteractableUI()
     {
-        uiImage.sprite = defaultSprite;
+        cursorImage.sprite = defaultSprite;
     }
-
     public void ShowInteractableUI()
     {
-        uiImage.sprite = interactableSprite;
+        cursorImage.sprite = interactableSprite;
+    }
+
+    //freeze camera movement
+    private void FreezeCamera()
+    {
+        if (cameraController != null)
+        {
+            cameraController.enabled = false;
+        }
+        isPickUpUIActive = true;
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = false;
+    }
+
+    //resume camera movement
+    private void ResumeCamera()
+    {
+        if (cameraController != null)
+        {
+            cameraController.enabled = true;
+        }
+        isPickUpUIActive = false;
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 }

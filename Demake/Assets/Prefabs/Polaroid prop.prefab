@@ -454,4 +454,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemName: Polaroid
-  itemSprite: {fileID: 0}
+  displayType: 1
+  descriptionText: 

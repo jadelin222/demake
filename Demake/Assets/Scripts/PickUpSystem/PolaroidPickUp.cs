@@ -9,6 +9,7 @@ public class PolaroidPickUp : PickUp
     {
         Debug.Log($"picked up polaroid number x");
         //UIManager.Instance.ShowBottomScreenUI($"Picked up: {itemName}");
+        UIManager.Instance.ShowPolaroidUI();
 
         //td: add to the polaroid inventory
         DestroyPickup();
