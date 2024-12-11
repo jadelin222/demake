@@ -2,8 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Net;
 using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.Rendering;
+//using UnityEngine.UI;
+//using UnityEngine.Rendering;
 
 public class CameraRayInteracter : MonoBehaviour
 {
@@ -15,10 +15,10 @@ public class CameraRayInteracter : MonoBehaviour
     public float maxDist = 1.2f; // m
     public LayerMask interactableLayer;
 
-    [Header("UI")]
-    public Image uiImage;
-    public Sprite defaultSprite;         
-    public Sprite interactableSprite;
+    //[Header("UI")]
+    //public Image uiImage;
+    //public Sprite defaultSprite;         
+    //public Sprite interactableSprite;
 
 
     void Update()
@@ -49,7 +49,8 @@ public class CameraRayInteracter : MonoBehaviour
             if (interactable != null)
             {
                 Debug.Log("interactable object hit!");
-                uiImage.sprite = interactableSprite;
+                //uiImage.sprite = interactableSprite;
+                UIManager.Instance.ShowInteractableUI();
                 interactable.OnRayHit();
                  
                 if (Input.GetKeyDown(KeyCode.E) || Input.GetMouseButtonDown(0))
@@ -64,7 +65,8 @@ public class CameraRayInteracter : MonoBehaviour
         else
         {
             //Debug.DrawLine(Camera.main.transform.position, rayHit.point, Color.green, 2f);//not working
-            uiImage.sprite = defaultSprite;
+            //uiImage.sprite = defaultSprite;
+            UIManager.Instance.HideInteractableUI();
             UIManager.Instance.HideControlHintUI();
         }
     }

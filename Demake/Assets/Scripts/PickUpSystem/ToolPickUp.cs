@@ -16,6 +16,8 @@ public class ToolPickUp : PickUp
         }
 
         Debug.Log($"Picked up tool: {toolObject.name}");
+        // Display the pickup UI using the UIManager
+        UIManager.Instance.ShowPickupUI("Close", $"Obtained {toolObject.name}");
         ToolSystem.Instance.CollectTool(toolObject);
         DestroyPickup();
     }

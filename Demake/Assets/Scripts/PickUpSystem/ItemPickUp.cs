@@ -8,7 +8,8 @@ public class ItemPickUp : PickUp
     public override void Interact()
     {
         Debug.Log($"picked up item: {itemName}");
-        //UIManager.Instance.ShowBottomScreenUI($"Picked up: {itemName}");
+
+        UIManager.Instance.ShowPickupUI("Close", $"Obtained {itemName}");
 
         //td:add to the items inventory
         DestroyPickup();
