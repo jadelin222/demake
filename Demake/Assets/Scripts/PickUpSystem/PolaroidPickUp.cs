@@ -9,11 +9,24 @@ public class PolaroidPickUp : PickUp
     {
         Debug.Log($"picked up polaroid number x");
         //UIManager.Instance.ShowBottomScreenUI($"Picked up: {itemName}");
-        UIManager.Instance.ShowPolaroidUI();
-        //ShowPickupUI();
+        //UIManager.Instance.ShowPolaroidUI();
+        PickupUIData uiData = new PickupUIData
+        {
+            displayType = PickupDisplayType.Polaroid,
+            bottomMessage = $"You found a Polaroid!",
+            descriptionText = descriptionText,
+            imageSprite = polaroidImage,
+            actionVerb = "OK"
+        };
 
-        //td: add to the polaroid inventory
-        DestroyPickup();
+        UIManager.Instance.ShowPickupUI(uiData, FinalizePickup);
+
     }
+    //public override void FinalizePickup()
+    //{
+    //    //td: add to the polaroid inventory
+
+    //    DestroyPickup();
+    //}
 
 }

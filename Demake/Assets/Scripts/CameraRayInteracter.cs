@@ -66,7 +66,8 @@ public class CameraRayInteracter : MonoBehaviour
         {
             //Debug.DrawLine(Camera.main.transform.position, rayHit.point, Color.green, 2f);//not working
             //uiImage.sprite = defaultSprite;
-            UIManager.Instance.HideInteractableUI();
+            //UIManager.Instance.HideInteractableUI();
+            UIManager.Instance.ShowNonInteractableUI();
             UIManager.Instance.HideControlHintUI();
         }
     }

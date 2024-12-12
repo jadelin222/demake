@@ -14,11 +14,15 @@ public class ToolPickUp : PickUp
             Debug.LogError("tool object not assigned");
             return;
         }
-        //UIManager.Instance.ShowPickupUI("Close", $"Obtained {toolObject.name}");
-        // Display the pickup UI and pass the pickup logic as a callback
-        UIManager.Instance.ShowPickupUI("Close", $"Obtained {toolObject.name}", FinalizePickup);
-        //ToolSystem.Instance.CollectTool(toolObject);
-        //DestroyPickup();
+        //display the pickup UI and pass the pickup logic as a callback
+        PickupUIData uiData = new PickupUIData
+        {
+            displayType = PickupDisplayType.ItemOrTool,
+            bottomMessage = $"Obtained {toolObject.name}",
+            actionVerb = "Close"
+        };
+
+        UIManager.Instance.ShowPickupUI(uiData, FinalizePickup);
     }
     public override void FinalizePickup()
     {
@@ -28,8 +32,7 @@ public class ToolPickUp : PickUp
             ToolSystem.Instance.CollectTool(toolObject);
             Debug.Log($"Collected tool: {toolObject.name}");
         }
-
-        DestroyPickup();
+        Destroy(gameObject);
     }
 
 }

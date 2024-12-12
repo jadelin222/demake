@@ -76,11 +76,8 @@ public class ToolSystem : MonoBehaviour
         EquipTool(currentToolIndex);
     }
 
-    public GameObject GetActiveToolObject()
+    public void PutAwayActiveTool()
     {
-        if (activeTool != null)
-            return activeTool.gameObject; //return the GameObject 
-        else
-            return null; 
+        if (activeTool != null) activeTool.PutAway();
     }
 }

@@ -1,17 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-
-//public enum ToolType
-//{
-//    None,
-//    Shovel,
-//    Hammer,
-//    WateringCan,
-//    Trumpet
-
-//}
-//abstract tool class
 public abstract class Tool : MonoBehaviour
 {
     public string toolName;

@@ -2,6 +2,7 @@ using System;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+//using static UnityEngine.Rendering.BoolParameter;
 public class UIManager : MonoBehaviour
 {
     public static UIManager Instance;
@@ -11,11 +12,17 @@ public class UIManager : MonoBehaviour
     public TMP_Text controlHintText;
 
     [Header("Pick Up Mask UI")]
-    public GameObject pickUpMaskUI;        //main UI for real-time masked display
+    public GameObject pickUpMaskUI;        //main UI for all pickup UI
     public TMP_Text bottomLeftMessage;     //"Obtained {name}"
-    public GameObject blackBackground;
+    //public GameObject blackBackground;
+    public GameObject ItemOrToolUI;
+    public GameObject PolaroidUI;
+    public GameObject LetterUI;
+    public TMP_Text letterText;
+    public Image polaroidImage;
+    public TMP_Text polaroidText;
 
-    public GameObject colsePanellHintUI;
+    //public GameObject colsePanellHintUI;
     public TMP_Text closeHintText;
 
     [Header("Bottom Screen UI")]
@@ -33,8 +40,6 @@ public class UIManager : MonoBehaviour
     public Sprite interactableSprite;
 
     private Action onPickupClosed;  //callback to finalize pickup
-    private GameObject previousActiveTool; //store the reference to the equipped tool
-
 
 
     void Awake()
@@ -59,56 +64,95 @@ public class UIManager : MonoBehaviour
     {
         //with type writer fx
     }
-    //public void ShowPickupUI(string actionVerb, string bottomMessage)
-    public void ShowPickupUI(string actionVerb, string bottomMessage, Action onClose)
+
+    /// <summary>
+    /// When attempt to pick up item, shows this ui to display info
+    /// </summary>
+    public void ShowPickupUI(PickupUIData uiData, Action onClose)
+    //public void ShowPickupUI(PickupDisplayType displayType, string bottomMessage, Action onClose)
     {
+        ToolSystem.Instance.PutAwayActiveTool();
+        pickUpMaskUI.SetActive(true); //bring up the UI group for pickup interaction
+                                      //closeHintText.text = $"Q - {actionVerb}";
 
-        previousActiveTool = ToolSystem.Instance.GetActiveToolObject();
-        if (previousActiveTool != null)
+        //hide all other panels
+        ItemOrToolUI.SetActive(false);
+        LetterUI.SetActive(false);
+        PolaroidUI.SetActive(false);
+
+        // Decide which UI to show
+        switch (uiData.displayType)
         {
-            previousActiveTool.SetActive(false);
-        }
-        //show control hint
-        CursorUI.SetActive(false);
-        colsePanellHintUI.SetActive(true);
-        closeHintText.text = $"Q - {actionVerb}";
+            case PickupDisplayType.ItemOrTool:
+                ShowItemOrToolUI(uiData);
+                break;
 
-        pickUpMaskUI.SetActive(true);
-        bottomLeftMessage.text = bottomMessage;
+            case PickupDisplayType.Polaroid:
+                ShowPolaroidUI(uiData);
+                break;
+
+            case PickupDisplayType.Letter:
+                ShowLetterUI(uiData);
+                break;
+        }
+
+        //switch (displayType)
+        //{
+        //    case PickupDisplayType.ItemOrTool:
+        //        ShowItemOrToolUI(bottomMessage, "Collect");
+        //        break;
+        //    case PickupDisplayType.Polaroid:
+        //        ShowPolaroidUI(bottomMessage, "Collect");
+        //        break;
+        //    case PickupDisplayType.Letter:
+        //        ShowLetterUI(bottomMessage, "OK");
+        //        break;
+        //}
 
         onPickupClosed = onClose;
-
         FreezeCamera();
 
-        //later for displaying letters/texts/polaroid? 
-        //if (blackBackground != null)
-        //    blackBackground.SetActive(true);
     }
     public void HidePickupUI()
     {
-
         HideControlHintUI();
-        CursorUI.SetActive(true);
+        ShowInteractableUI();
+        
         pickUpMaskUI.SetActive(false);
-        colsePanellHintUI.SetActive(false);
 
         //invoke the callback to finalize pickup
         onPickupClosed?.Invoke();
         onPickupClosed = null;
+
         ResumeCamera();
-
-
-        //if (blackBackground != null)
-        //    blackBackground.SetActive(false);
     }
-    public void ShowLetterUI()
+    public void ShowItemOrToolUI(PickupUIData uiData)
     {
+        ItemOrToolUI.SetActive(true);
+        bottomLeftMessage.text = uiData.bottomMessage;
+        closeHintText.text = $"Q - {uiData.actionVerb}";
 
     }
-    public void ShowPolaroidUI()
+    public void ShowLetterUI(PickupUIData uiData)
     {
+        LetterUI.SetActive(true);
+        bottomLeftMessage.text = uiData.bottomMessage;
+        letterText.text = uiData.descriptionText;
+        closeHintText.text = $"Q - {uiData.actionVerb}";
 
     }
+    public void ShowPolaroidUI(PickupUIData uiData)
+    {
+        PolaroidUI.SetActive(true);
+        bottomLeftMessage.text = uiData.bottomMessage;
+        closeHintText.text = $"Q - {uiData.actionVerb}";
+
+        polaroidImage.sprite = uiData.imageSprite;
+        polaroidText.text = uiData.descriptionText;
+    }
+    /// <summary>
+    /// the control hint shown when raycast hit interactable object
+    /// </summary>
     public void ShowControlHintUI(string actionVerb)
     {
         controlHintUI.SetActive(true);
@@ -120,9 +164,13 @@ public class UIManager : MonoBehaviour
     }
 
     /// <summary>
-    /// interactable item when hit by ray will change the cursor UI at the center of the screen
+    /// MID SCREEN CURSOR - interactable item when hit by ray will change the cursor UI at the center of the screen
     /// </summary>
     public void HideInteractableUI()
+    {
+        CursorUI.SetActive(false);
+    }
+    public void ShowNonInteractableUI()
     {
         cursorImage.sprite = defaultSprite;
     }
@@ -131,17 +179,20 @@ public class UIManager : MonoBehaviour
         cursorImage.sprite = interactableSprite;
     }
 
-    //freeze camera movement by freezing cursor
+    /// <summary>
+    /// freeze camera movement by freezing cursor, also hide the cursor point in the middle of screen, freeze time. 
+    /// </summary>
     private void FreezeCamera()
     {
+        CursorUI.SetActive(false);
         Time.timeScale = 0f;
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = false;
     }
-
     //resume camera movement
     private void ResumeCamera()
     {
+        CursorUI.SetActive(true);
         Time.timeScale = 1f;
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
