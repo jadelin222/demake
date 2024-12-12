@@ -2677,7 +2677,7 @@ MeshCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 5
   m_Convex: 1
   m_CookingOptions: 30
@@ -46416,7 +46416,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemName: Scissors
   displayType: 0
-  descriptionText: 
+  descriptionText: Scissors
   toolObject: {fileID: 1405442258}
 --- !u!43 &980083007
 Mesh:
@@ -51273,18 +51273,6 @@ MonoBehaviour:
   interactableLayer:
     serializedVersion: 2
     m_Bits: 2048
---- !u!114 &1162514036 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 9018249871969862650, guid: 2d3a85ecde41a8246a79669975912b74,
-    type: 3}
-  m_PrefabInstance: {fileID: 2028361949}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1162514027}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 72ece51f2901e7445ab60da3685d6b5f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1165296054
 GameObject:
   m_ObjectHideFlags: 0
@@ -60164,7 +60152,7 @@ GameObject:
   - component: {fileID: 1405442259}
   - component: {fileID: 1405442260}
   m_Layer: 0
-  m_Name: scissor_tool
+  m_Name: Scissors
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -60247,7 +60235,6 @@ MonoBehaviour:
   cursorImage: {fileID: 1334964919}
   defaultSprite: {fileID: 21300000, guid: 95536a7810238db4abb5c02d9b700c92, type: 3}
   interactableSprite: {fileID: 21300000, guid: ebc82bb9dacba0f478d2a059e9181886, type: 3}
-  cameraController: {fileID: 1162514036}
 --- !u!4 &1408231673
 Transform:
   m_ObjectHideFlags: 0
@@ -88539,7 +88526,7 @@ GameObject:
   - component: {fileID: 2127839849}
   - component: {fileID: 2127839854}
   m_Layer: 0
-  m_Name: WateringCan
+  m_Name: Watering Can
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -9,11 +9,21 @@ public class ItemPickUp : PickUp
     {
         Debug.Log($"picked up item: {itemName}");
 
-        UIManager.Instance.ShowPickupUI("Close", $"Obtained {itemName}");
+        UIManager.Instance.ShowPickupUI("Close", $"Obtained {itemName}", FinalizePickup);
 
         //td:add to the items inventory
-        DestroyPickup();
+        //DestroyPickup();
+    }
+    public override void FinalizePickup()
+    {
+        Debug.Log($"Finalizing pickup for {itemName}");
+
+        // Add the item to the inventory
+        //InventorySystem.Instance.AddItem(itemName);
+
+        // Destroy the object in the scene
+        Destroy(gameObject);
     }
 
-   
+
 }

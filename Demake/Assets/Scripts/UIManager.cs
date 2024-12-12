@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
@@ -31,9 +32,9 @@ public class UIManager : MonoBehaviour
     public Sprite defaultSprite;
     public Sprite interactableSprite;
 
-    public MonoBehaviour cameraController;
-    private GameObject pendingItem;
-    private bool isPickUpUIActive = false;
+    private Action onPickupClosed;  //callback to finalize pickup
+    private GameObject previousActiveTool; //store the reference to the equipped tool
+
 
 
     void Awake()
@@ -58,9 +59,15 @@ public class UIManager : MonoBehaviour
     {
         //with type writer fx
     }
-    //public void ShowPickupUI(string actionVerb, string bottomMessage, GameObject item)
-    public void ShowPickupUI(string actionVerb, string bottomMessage)
+    //public void ShowPickupUI(string actionVerb, string bottomMessage)
+    public void ShowPickupUI(string actionVerb, string bottomMessage, Action onClose)
     {
+
+        previousActiveTool = ToolSystem.Instance.GetActiveToolObject();
+        if (previousActiveTool != null)
+        {
+            previousActiveTool.SetActive(false);
+        }
         //show control hint
         CursorUI.SetActive(false);
         colsePanellHintUI.SetActive(true);
@@ -69,8 +76,8 @@ public class UIManager : MonoBehaviour
         pickUpMaskUI.SetActive(true);
         bottomLeftMessage.text = bottomMessage;
 
-        //store pending item reference
-        //pendingItem = item;
+        onPickupClosed = onClose;
+
         FreezeCamera();
 
         //later for displaying letters/texts/polaroid? 
@@ -79,18 +86,15 @@ public class UIManager : MonoBehaviour
     }
     public void HidePickupUI()
     {
+
         HideControlHintUI();
         CursorUI.SetActive(true);
         pickUpMaskUI.SetActive(false);
         colsePanellHintUI.SetActive(false);
 
-        if (pendingItem != null)
-        {
-            ToolSystem.Instance.CollectTool(pendingItem);
-            Destroy(pendingItem);
-            pendingItem = null;
-        }
-
+        //invoke the callback to finalize pickup
+        onPickupClosed?.Invoke();
+        onPickupClosed = null;
         ResumeCamera();
 
 
@@ -127,14 +131,10 @@ public class UIManager : MonoBehaviour
         cursorImage.sprite = interactableSprite;
     }
 
-    //freeze camera movement
+    //freeze camera movement by freezing cursor
     private void FreezeCamera()
     {
-        if (cameraController != null)
-        {
-            cameraController.enabled = false;
-        }
-        isPickUpUIActive = true;
+        Time.timeScale = 0f;
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = false;
     }
@@ -142,11 +142,7 @@ public class UIManager : MonoBehaviour
     //resume camera movement
     private void ResumeCamera()
     {
-        if (cameraController != null)
-        {
-            cameraController.enabled = true;
-        }
-        isPickUpUIActive = false;
+        Time.timeScale = 1f;
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }

@@ -14,11 +14,21 @@ public class ToolPickUp : PickUp
             Debug.LogError("tool object not assigned");
             return;
         }
+        //UIManager.Instance.ShowPickupUI("Close", $"Obtained {toolObject.name}");
+        // Display the pickup UI and pass the pickup logic as a callback
+        UIManager.Instance.ShowPickupUI("Close", $"Obtained {toolObject.name}", FinalizePickup);
+        //ToolSystem.Instance.CollectTool(toolObject);
+        //DestroyPickup();
+    }
+    public override void FinalizePickup()
+    {
+        //add the tool to the ToolSystem when q presed
+        if (toolObject != null)
+        {
+            ToolSystem.Instance.CollectTool(toolObject);
+            Debug.Log($"Collected tool: {toolObject.name}");
+        }
 
-        Debug.Log($"Picked up tool: {toolObject.name}");
-        // Display the pickup UI using the UIManager
-        UIManager.Instance.ShowPickupUI("Close", $"Obtained {toolObject.name}");
-        ToolSystem.Instance.CollectTool(toolObject);
         DestroyPickup();
     }
 

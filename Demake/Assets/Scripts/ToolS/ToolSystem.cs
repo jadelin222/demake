@@ -75,4 +75,12 @@ public class ToolSystem : MonoBehaviour
         currentToolIndex = (currentToolIndex + 1) % toolInventory.Count;
         EquipTool(currentToolIndex);
     }
+
+    public GameObject GetActiveToolObject()
+    {
+        if (activeTool != null)
+            return activeTool.gameObject; //return the GameObject 
+        else
+            return null; 
+    }
 }
