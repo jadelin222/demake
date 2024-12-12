@@ -68,12 +68,11 @@ public class UIManager : MonoBehaviour
     /// <summary>
     /// When attempt to pick up item, shows this ui to display info
     /// </summary>
-    public void ShowPickupUI(PickupUIData uiData, Action onClose)
+    public void ShowPickupUI(PickupData uiData, Action onClose)
     //public void ShowPickupUI(PickupDisplayType displayType, string bottomMessage, Action onClose)
     {
         ToolSystem.Instance.PutAwayActiveTool();
         pickUpMaskUI.SetActive(true); //bring up the UI group for pickup interaction
-                                      //closeHintText.text = $"Q - {actionVerb}";
 
         //hide all other panels
         ItemOrToolUI.SetActive(false);
@@ -95,20 +94,7 @@ public class UIManager : MonoBehaviour
                 ShowLetterUI(uiData);
                 break;
         }
-
-        //switch (displayType)
-        //{
-        //    case PickupDisplayType.ItemOrTool:
-        //        ShowItemOrToolUI(bottomMessage, "Collect");
-        //        break;
-        //    case PickupDisplayType.Polaroid:
-        //        ShowPolaroidUI(bottomMessage, "Collect");
-        //        break;
-        //    case PickupDisplayType.Letter:
-        //        ShowLetterUI(bottomMessage, "OK");
-        //        break;
-        //}
-
+        Debug.Log("Callback assigned in ShowPickupUI.");
         onPickupClosed = onClose;
         FreezeCamera();
 
@@ -121,19 +107,21 @@ public class UIManager : MonoBehaviour
         pickUpMaskUI.SetActive(false);
 
         //invoke the callback to finalize pickup
+        Debug.Log("Invoking callback in HidePickupUI...");
         onPickupClosed?.Invoke();
         onPickupClosed = null;
+        Debug.Log("Callback executed.");
 
         ResumeCamera();
     }
-    public void ShowItemOrToolUI(PickupUIData uiData)
+    public void ShowItemOrToolUI(PickupData uiData)
     {
         ItemOrToolUI.SetActive(true);
         bottomLeftMessage.text = uiData.bottomMessage;
         closeHintText.text = $"Q - {uiData.actionVerb}";
 
     }
-    public void ShowLetterUI(PickupUIData uiData)
+    public void ShowLetterUI(PickupData uiData)
     {
         LetterUI.SetActive(true);
         bottomLeftMessage.text = uiData.bottomMessage;
@@ -141,7 +129,7 @@ public class UIManager : MonoBehaviour
         closeHintText.text = $"Q - {uiData.actionVerb}";
 
     }
-    public void ShowPolaroidUI(PickupUIData uiData)
+    public void ShowPolaroidUI(PickupData uiData)
     {
         PolaroidUI.SetActive(true);
         bottomLeftMessage.text = uiData.bottomMessage;

@@ -5,7 +5,7 @@ public abstract class PickUp : MonoBehaviour, IInteractable
     public string itemName;
     public PickupDisplayType displayType;
     public string descriptionText;
-    public Sprite polaroidImage;
+    public Sprite image;
     public ItemType RequiredItem => ItemType.None;
 
     public abstract string InteractionVerb { get; }

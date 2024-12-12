@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PolaroidPickUp : PickUp
@@ -7,26 +8,23 @@ public class PolaroidPickUp : PickUp
     public override string InteractionVerb => "Inspect";
     public override void Interact()
     {
-        Debug.Log($"picked up polaroid number x");
-        //UIManager.Instance.ShowBottomScreenUI($"Picked up: {itemName}");
-        //UIManager.Instance.ShowPolaroidUI();
-        PickupUIData uiData = new PickupUIData
-        {
-            displayType = PickupDisplayType.Polaroid,
-            bottomMessage = $"You found a Polaroid!",
-            descriptionText = descriptionText,
-            imageSprite = polaroidImage,
-            actionVerb = "OK"
-        };
+        //Debug.Log($"picked up polaroid number x");
+
+        PickupData uiData = new PickupData
+            (PickupDisplayType.Polaroid,
+            "OK",
+            $"Collected {itemName}",
+            descriptionText,
+            image);
 
         UIManager.Instance.ShowPickupUI(uiData, FinalizePickup);
 
-    }
-    //public override void FinalizePickup()
-    //{
-    //    //td: add to the polaroid inventory
 
-    //    DestroyPickup();
-    //}
+    }
+    public override void FinalizePickup()
+    {
+        PolaroidSystem.Instance.CollectPolaroid(image, descriptionText);
+        Destroy(gameObject);
+    }
 
 }

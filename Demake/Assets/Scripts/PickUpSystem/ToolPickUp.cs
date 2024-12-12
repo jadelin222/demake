@@ -15,14 +15,23 @@ public class ToolPickUp : PickUp
             return;
         }
         //display the pickup UI and pass the pickup logic as a callback
-        PickupUIData uiData = new PickupUIData
-        {
-            displayType = PickupDisplayType.ItemOrTool,
-            bottomMessage = $"Obtained {toolObject.name}",
-            actionVerb = "Close"
-        };
-
+        var uiData = new PickupData
+            (PickupDisplayType.ItemOrTool, 
+            "Close", 
+            $"Obtained {toolObject.name}", 
+            "",
+            image);
         UIManager.Instance.ShowPickupUI(uiData, FinalizePickup);
+
+
+        //PickupData uiData = new PickupData
+        //{
+        //    displayType = PickupDisplayType.ItemOrTool,
+        //    bottomMessage = $"Obtained {toolObject.name}",
+        //    actionVerb = "Close",
+        //    descriptionText = ""
+        //};
+
     }
     public override void FinalizePickup()
     {
@@ -30,7 +39,7 @@ public class ToolPickUp : PickUp
         if (toolObject != null)
         {
             ToolSystem.Instance.CollectTool(toolObject);
-            Debug.Log($"Collected tool: {toolObject.name}");
+            //Debug.Log($"Collected tool: {toolObject.name}");
         }
         Destroy(gameObject);
     }

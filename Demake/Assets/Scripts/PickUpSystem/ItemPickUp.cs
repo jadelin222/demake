@@ -8,22 +8,21 @@ public class ItemPickUp : PickUp
     {
         //Debug.Log($"picked up item: {itemName}");
 
-        PickupUIData uiData = new PickupUIData
-        {
-            displayType = PickupDisplayType.ItemOrTool,
-            bottomMessage = $"Obtained {itemName}",
-            actionVerb = "Close"
-        };
+        var uiData = new PickupData
+           (PickupDisplayType.ItemOrTool,
+           "OK",
+           $"Collected {itemName}",
+           descriptionText,
+           image);
 
         UIManager.Instance.ShowPickupUI(uiData, FinalizePickup);
-        //td:add to the items inventory
-        //DestroyPickup();
+
     }
     public override void FinalizePickup()
     {
-
         // Add the item to the inventory
         //InventorySystem.Instance.AddItem(itemName);
+        ItemSystem.Instance.CollectItem(image, descriptionText);
         Destroy(gameObject);
     }
 
