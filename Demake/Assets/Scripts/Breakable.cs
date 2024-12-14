@@ -14,13 +14,13 @@ public class Breakable : MonoBehaviour, IInteractable
     {
         //break the item, unhide the fragments and hide full object. 
         if (isBroken) return;
+        else BreakObject();
 
-        BreakObject();
     }
 
     public void OnRayHit()
     { 
-        if (!isBroken)
+        if (!isBroken && ToolSystem.Instance.EquippedToolType == RequiredItem)
         {
             //show ui to hit with hammer
         }
@@ -31,7 +31,7 @@ public class Breakable : MonoBehaviour, IInteractable
         isBroken = true;
         fullObject.SetActive(false);
         fragments.SetActive(true);
-        Debug.Log($"{gameObject.name} is broken!");
+        //Debug.Log($"{gameObject.name} is broken!");
     }
 
 }

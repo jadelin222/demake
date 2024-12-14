@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class ItemPickUp : PickUp
 {
+    public ItemType itemType;
     public override string InteractionVerb => "Pickup";
     public override void Interact()
     {
@@ -21,8 +22,7 @@ public class ItemPickUp : PickUp
     public override void FinalizePickup()
     {
         // Add the item to the inventory
-        //InventorySystem.Instance.AddItem(itemName);
-        ItemSystem.Instance.CollectItem(image, descriptionText);
+        ItemSystem.Instance.CollectItem(image, descriptionText, itemType);
         Destroy(gameObject);
     }
 

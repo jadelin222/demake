@@ -9,7 +9,7 @@ using UnityEngine;
 public class ToolSystem : MonoBehaviour
 {
     public static ToolSystem Instance;
-
+    [SerializeField]
     private List<Tool> toolInventory = new List<Tool>();
     private int currentToolIndex = 0;
     //private ITool activeTool;
@@ -20,6 +20,18 @@ public class ToolSystem : MonoBehaviour
     void Awake()
     {
         Instance = this;
+    }
+    private void Update()
+    {
+        //tool controls
+        if (Input.GetMouseButtonDown(1))  //cycle to the next tool right mouse
+        {
+            CycleToNextTool();
+        }
+        if (Input.GetMouseButtonDown(0))
+        {
+            UseActiveTool();
+        }
     }
     public void CollectTool(GameObject toolObject)
     {

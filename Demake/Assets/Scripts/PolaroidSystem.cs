@@ -6,6 +6,7 @@ public class PolaroidSystem : MonoBehaviour
 {
     public static PolaroidSystem Instance;
 
+    [SerializeField] 
     private List<PolaroidData> polaroidCollection = new List<PolaroidData>();
 
     private void Awake()
@@ -22,7 +23,17 @@ public class PolaroidSystem : MonoBehaviour
     {
         return polaroidCollection;
     }
-    public bool IsPuzzleSolved()
+
+    [ContextMenu("print Polaroid inventory")]
+    private void DebugInventory()
+    {
+        foreach (var polaroid in polaroidCollection)
+        {
+            Debug.Log($"Polaroid: {polaroid.descriptionText}, Solved: {polaroid.isPuzzleSolved}");
+        }
+    }
+
+public bool IsPuzzleSolved()
     {
         foreach (var polaroid in polaroidCollection)
         {

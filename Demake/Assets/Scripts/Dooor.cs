@@ -1,19 +1,32 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Dooor : MonoBehaviour, IInteractable
 {
+    [Header("Door Settings")]
     public bool isOpen = false;
     public bool isKeyNeeded;
-    //public string requiredKeyName;
-    public ItemType RequiredItem => ItemType.KeyToA;//to change to drop down menu or?
-    public string InteractionVerb => "Open";
-    //private PlayerInventory playerInventory;
 
+    [Header("Required Item")]
+    [SerializeField] 
+    private ItemType requiredItem = ItemType.None; //backing field
+    public ItemType RequiredItem => requiredItem;
+    public string InteractionVerb => "Open";
+
+    [Header("Animation and Sound")]
+    private Animator animator;
+    private AudioSource audioSource;
+
+    public AudioClip doorOpenSound;
+    public AudioClip doorLockedSound;
+
+    private void Start()
+    {
+        animator = GetComponent<Animator>();
+        audioSource = GetComponent<AudioSource>();
+    }
     public void Interact()
     {
-        Debug.Log("interact with door");
         //if key is not needed, open door
         if (!isKeyNeeded)
         {
@@ -25,20 +38,21 @@ public class Dooor : MonoBehaviour, IInteractable
         else
         {
             //if need key, check if player have that key
-            bool hasRequiredKey = true;
+            bool hasRequiredItem = ItemSystem.Instance.HasItem(RequiredItem); ;
             //hasRequiredKey = playerInventory.HasKey(requiredKeyName);
 
-            if (hasRequiredKey)
+            if (hasRequiredItem)
             {
+                Debug.Log("you have the right key");
                 OpenDoor();
-
+                ItemSystem.Instance.MarkItemAsUsed(RequiredItem);
                 //td:mark the key as used in inventory
             }
             else
             {
                 //if no correct key obtained, display text. 
                 Debug.Log("you don't seem to have the right key");
-                ShakeDoor();
+                PlayLockedAnim();
                 PlayLockedSound();
             }
         }
@@ -49,6 +63,7 @@ public class Dooor : MonoBehaviour, IInteractable
     public void OnRayHit()
     {
         Debug.Log("looking at door");
+        UIManager.Instance.ShowControlHintUI(InteractionVerb);
     }
 
     private void OpenDoor()
@@ -57,7 +72,7 @@ public class Dooor : MonoBehaviour, IInteractable
         {
             isOpen = true;
             Debug.Log("door opened");
-            
+            PlayOpenAnim();
             PlayOpenSound();
             
         }  
@@ -69,27 +84,51 @@ public class Dooor : MonoBehaviour, IInteractable
         {
             isOpen = false;
             Debug.Log("door closed");
-
+            
             PlayCloseSound();
             //td:anim door
         }
     }
 
-    private void ShakeDoor()
+    private void PlayOpenAnim()
     {
-        //anim
-        Debug.Log("door locked, shaking");
+        animator.SetTrigger("Open");
     }
     private void PlayOpenSound()
     {
-        Debug.Log("playing open sound");
+        //Debug.Log("playing open sound");
+        audioSource.PlayOneShot(doorOpenSound);
+
+    }
+    private IEnumerator ShakeDoorRoutine()
+    {
+        Vector3 originalPosition = transform.localPosition;
+        float duration = 1f;
+        float magnitude = 0.03f;
+
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            float z = Random.Range(-magnitude, magnitude);
+            transform.localPosition = originalPosition + new Vector3(0, 0, z);
+
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        transform.localPosition = originalPosition;
+    }
+    private void PlayLockedAnim()
+    {
+        StartCoroutine(ShakeDoorRoutine());
+    }
+    private void PlayLockedSound()
+    {
+        audioSource.PlayOneShot(doorLockedSound);
     }
     private void PlayCloseSound()
     {
         Debug.Log("play close sound");
-    }
-    private void PlayLockedSound()
-    {
-        Debug.Log("play locked sound");
     }
 }
