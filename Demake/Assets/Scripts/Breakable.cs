@@ -4,12 +4,14 @@ using UnityEngine;
 
 public class Breakable : MonoBehaviour, IInteractable
 {
-    public GameObject fullObject;
-    public GameObject fragments;
+    [SerializeField]
+    private GameObject fullObject;
+    [SerializeField]
+    private GameObject fragments;
     public ItemType RequiredItem => ItemType.Hammer;
     public string InteractionVerb => "Break";
 
-    private bool isBroken = false;  // To track if the object is already broken
+    private bool isBroken = false;  //track if the object is already broken
     public void Interact()
     {
         //break the item, unhide the fragments and hide full object. 
