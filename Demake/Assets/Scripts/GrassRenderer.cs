@@ -12,9 +12,11 @@ public class GrassRenderer : MonoBehaviour
 {
     [Header("Grass Settings")]
     public Mesh grassMeshA;     
-    public Mesh grassMeshB;        
+    public Mesh grassMeshB;
+    //public Mesh smallGrassMeshA; 
+    //public Mesh smallGrassMeshB;
     public Material grassMaterial;  
-    public int grassCountPerSurface = 200;
+    public int grassCountPerSurface = 200; //instances
 
     [Header("Flower Settings")]
     public Mesh flowerMesh;
@@ -28,9 +30,11 @@ public class GrassRenderer : MonoBehaviour
     private List<Matrix4x4> matricesB = new List<Matrix4x4>(); //grass
     private List<Matrix4x4> matricesFlower = new List<Matrix4x4>();
 
-    private List<Vector3> placedPositions = new List<Vector3>(); 
-
     private float minDistance = 0.4f;
+    private List<Vector3> placedPositions = new List<Vector3>();
+
+    private List<bool> grassCutStatesA = new List<bool>();
+    private List<bool> grassCutStatesB = new List<bool>();
 
     //private int countA = 0;
     //private int countB = 0;
@@ -92,17 +96,18 @@ public class GrassRenderer : MonoBehaviour
 
             float verticalOffset = 0.01f; //make the grass sink inthe floor
             position.y -= verticalOffset;
+            Quaternion randomRotation = Quaternion.Euler(0f, Random.Range(0f, 360f), 0f); //random rotation
             //place the instance in the appropriate list
             if (meshB != null) //grass
             {
                 bool useMeshA = Random.value > 0.5f;  //50%chance spawning each grass mesh
-                if (useMeshA)
+                if (useMeshA)                 //position, rotation, scale
                     matricesA.Add(Matrix4x4.TRS(position, Quaternion.identity, Vector3.one));
                 else
                     matricesB.Add(Matrix4x4.TRS(position, Quaternion.identity, Vector3.one));
             }
             else if (matricesB == null) // flowers
-                matricesFlower.Add(Matrix4x4.TRS(position, Quaternion.identity, Vector3.one));
+                matricesFlower.Add(Matrix4x4.TRS(position, randomRotation, Vector3.one));
         }
     }
 
@@ -118,6 +123,7 @@ public class GrassRenderer : MonoBehaviour
 
     private void Update()
     {
+        //draw using gpu instancing
         //grass A
         if (matricesA.Count > 0)
             Graphics.DrawMeshInstanced(grassMeshA, 0, grassMaterial, matricesA.ToArray());
@@ -128,6 +134,31 @@ public class GrassRenderer : MonoBehaviour
         //flowers
         if (matricesFlower.Count > 0)
             Graphics.DrawMeshInstanced(flowerMesh, 0, flowerMaterial, matricesFlower.ToArray());
+    }
+
+    public void CutGrass(Vector3 cutPosition, float radius)
+    {
+        //grass A
+        for (int i = 0; i < matricesA.Count; i++)
+        {
+            Vector3 grassPosition = matricesA[i].GetColumn(3); //extract position from matrix
+
+            if (Vector3.Distance(grassPosition, cutPosition) <= radius)
+                //make grass small
+                matricesA[i] = Matrix4x4.TRS(grassPosition, Quaternion.identity, Vector3.one * 0.4f);
+
+        }
+
+        //grass B 
+        for (int i = 0; i < matricesB.Count; i++)
+        {
+            Vector3 grassPosition = matricesB[i].GetColumn(3);
+
+            if (Vector3.Distance(grassPosition, cutPosition) <= radius)
+                matricesB[i] = Matrix4x4.TRS(grassPosition, Quaternion.identity, Vector3.one * 0.4f);
+
+        }
+
     }
 
 

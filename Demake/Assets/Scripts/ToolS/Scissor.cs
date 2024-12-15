@@ -4,13 +4,19 @@ using UnityEngine;
 
 public class Scissor : Tool
 {
+    [Range(0f, 2f)]
+    public float cutRadius = 1f;
     public override void UseTool()
     {
-        //Debug.Log("using scissor...");
         CutGrass();
     }
     private void CutGrass()
     {
-        Debug.Log("cutting grass..");
+        GrassRenderer grassRenderer = FindObjectOfType<GrassRenderer>();
+        if (grassRenderer != null)
+        {
+            Vector3 cutPosition = transform.position; 
+            grassRenderer.CutGrass(cutPosition, cutRadius);
+        }
     }
 }
