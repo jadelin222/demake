@@ -37,8 +37,8 @@ public class CameraRayInteracter : MonoBehaviour
                 if (Input.GetKeyDown(KeyCode.E))
                 {
                     //Debug.Log("E pressed");
-                    //interactable.Interact();  
-                    HandleInteraction(interactable);
+                    interactable.Interact();
+                    //HandleInteraction(interactable);
 
                 }
                 if (Input.GetMouseButtonDown(0)) // Left Mouse Button

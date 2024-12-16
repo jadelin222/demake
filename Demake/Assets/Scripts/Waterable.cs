@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Waterable : MonoBehaviour, IInteractable
-{ 
+{
+    private AudioSource audioSource;
+    public AudioClip waterSound;
     public ItemType RequiredItem => ItemType.WateringCan;
-    public string InteractionVerb => "Water";
+    public string InteractionVerb => "Insppect";
 
     [SerializeField]
     private GameObject rottenObject;
@@ -15,16 +17,21 @@ public class Waterable : MonoBehaviour, IInteractable
     public void Interact()
     {
         if (isWatered) return;
-        else WaterObject();
+        PlayWaterSound();
+        WaterObject();
     }
 
     public void OnRayHit()
     {
         return;
     }
+    private void PlayWaterSound()
+    {
+        if (audioSource != null && waterSound != null)
+            audioSource.PlayOneShot(waterSound);
+    }
     private void WaterObject()
     {
-        Debug.Log("Revived!");
         isWatered = true;
         rottenObject.SetActive(false);
         revivedObject.SetActive(true);

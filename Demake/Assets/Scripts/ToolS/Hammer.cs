@@ -6,11 +6,9 @@ public class Hammer : Tool
 {
     public override void UseTool()
     {
-        Debug.Log("hammering stuff...");
-        HitStuff();
     }
     private void HitStuff()
     {
-        Debug.Log("aw you are hitting on stuff");
+        
     }
 }

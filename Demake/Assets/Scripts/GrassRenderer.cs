@@ -20,22 +20,28 @@ public class GrassRenderer : MonoBehaviour
 
     [Header("Flower Settings")]
     public Mesh flowerMesh;
+    public Mesh cutFlowerMesh;
     public Material flowerMaterial;
     public int flowerCountPerSurface = 50;
 
-    [Header("Surfaces")]
+    [Header("Spwan Surfaces")]
     public List<SurfaceSettings> spawnSurfaces; //list of surfaces to spawn grass/grass+flowers on
 
     private List<Matrix4x4> matricesA = new List<Matrix4x4>(); //grass
     private List<Matrix4x4> matricesB = new List<Matrix4x4>(); //grass
     private List<Matrix4x4> matricesFlower = new List<Matrix4x4>();
+    private List<Matrix4x4> matricesFlowersCut = new List<Matrix4x4>();
 
     private float minDistance = 0.4f;
     private List<Vector3> placedPositions = new List<Vector3>();
+    //grass calculation
+    private int initialGrassCount; 
+    private int currentGrassCount;
+    private int flowerCutCount;
 
-    private List<bool> grassCutStatesA = new List<bool>();
-    private List<bool> grassCutStatesB = new List<bool>();
 
+    //private List<bool> grassCutStatesA = new List<bool>();
+    //private List<bool> grassCutStatesB = new List<bool>();
     //private int countA = 0;
     //private int countB = 0;
 
@@ -51,6 +57,8 @@ public class GrassRenderer : MonoBehaviour
                     SpawnFlowersOnSurface(surfaceSettings.surface);
             }
         }
+        initialGrassCount = matricesA.Count + matricesB.Count;
+        currentGrassCount = initialGrassCount;
     }
     private void SpawnGrassOnSurface(MeshFilter surface)
     {
@@ -123,6 +131,13 @@ public class GrassRenderer : MonoBehaviour
 
     private void Update()
     {
+
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            float percentage = GetGrassCutPercentage();
+            Debug.Log($"grass cut percentage: {percentage:F2}%");
+        }
+
         //draw using gpu instancing
         //grass A
         if (matricesA.Count > 0)
@@ -134,6 +149,9 @@ public class GrassRenderer : MonoBehaviour
         //flowers
         if (matricesFlower.Count > 0)
             Graphics.DrawMeshInstanced(flowerMesh, 0, flowerMaterial, matricesFlower.ToArray());
+        //cut flowers
+        if (matricesFlowersCut.Count > 0)
+            Graphics.DrawMeshInstanced(cutFlowerMesh, 0, flowerMaterial, matricesFlowersCut.ToArray());
     }
 
     public void CutGrass(Vector3 cutPosition, float radius)
@@ -144,9 +162,13 @@ public class GrassRenderer : MonoBehaviour
             Vector3 grassPosition = matricesA[i].GetColumn(3); //extract position from matrix
 
             if (Vector3.Distance(grassPosition, cutPosition) <= radius)
+            {
                 //make grass small
-                matricesA[i] = Matrix4x4.TRS(grassPosition, Quaternion.identity, Vector3.one * 0.4f);
-
+                matricesA[i] = Matrix4x4.TRS(grassPosition, Quaternion.identity, Vector3.one * 0.5f);
+                currentGrassCount--;
+            }
+                
+        
         }
 
         //grass B 
@@ -155,10 +177,33 @@ public class GrassRenderer : MonoBehaviour
             Vector3 grassPosition = matricesB[i].GetColumn(3);
 
             if (Vector3.Distance(grassPosition, cutPosition) <= radius)
-                matricesB[i] = Matrix4x4.TRS(grassPosition, Quaternion.identity, Vector3.one * 0.4f);
+            {
+                matricesB[i] = Matrix4x4.TRS(grassPosition, Quaternion.identity, Vector3.one * 0.5f);
+                currentGrassCount--;
+            }
+                
 
         }
+        //flowers
+        for (int i = matricesFlower.Count - 1; i >= 0; i--) 
+        {
+            Vector3 flowerPosition = matricesFlower[i].GetColumn(3);
 
+            if (Vector3.Distance(flowerPosition, cutPosition) <= radius)
+            {
+                //replace flower with cut flower mesh
+                matricesFlowersCut.Add(Matrix4x4.TRS(flowerPosition, Quaternion.identity, Vector3.one));
+                matricesFlower.RemoveAt(i); //remove the original flower
+                flowerCutCount++;
+            }
+        }
+
+    }
+    public float GetGrassCutPercentage()
+    {
+        int grassCut = initialGrassCount - currentGrassCount;
+
+        return (grassCut / (float)initialGrassCount) * 100f;
     }
 
 

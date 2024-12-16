@@ -25,13 +25,9 @@ public class ToolSystem : MonoBehaviour
     {
         //tool controls
         if (Input.GetMouseButtonDown(1))  //cycle to the next tool right mouse
-        {
             CycleToNextTool();
-        }
         if (Input.GetMouseButtonDown(0))
-        {
             UseActiveTool();
-        }
     }
     public void CollectTool(GameObject toolObject)
     {
