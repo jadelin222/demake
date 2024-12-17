@@ -88,4 +88,16 @@ public class ToolSystem : MonoBehaviour
     {
         if (activeTool != null) activeTool.PutAway();
     }
+
+    public bool HasTool(ItemType itemType)
+    {
+        foreach (var tool in toolInventory)
+        {
+            if (tool.ToolType == itemType)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 }

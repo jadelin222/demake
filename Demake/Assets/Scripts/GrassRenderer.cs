@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -13,8 +14,6 @@ public class GrassRenderer : MonoBehaviour
     [Header("Grass Settings")]
     public Mesh grassMeshA;     
     public Mesh grassMeshB;
-    //public Mesh smallGrassMeshA; 
-    //public Mesh smallGrassMeshB;
     public Material grassMaterial;  
     public int grassCountPerSurface = 200; //instances
 
@@ -27,6 +26,12 @@ public class GrassRenderer : MonoBehaviour
     [Header("Spwan Surfaces")]
     public List<SurfaceSettings> spawnSurfaces; //list of surfaces to spawn grass/grass+flowers on
 
+    [Header("Particle Effect")]
+    public GameObject cutEffectPrefab; // Prefab of the particle effect to play
+    private List<ParticleSystem> activeParticles = new List<ParticleSystem>();
+    private Queue<GameObject> particlePool = new Queue<GameObject>(); //pooling
+
+
     private List<Matrix4x4> matricesA = new List<Matrix4x4>(); //grass
     private List<Matrix4x4> matricesB = new List<Matrix4x4>(); //grass
     private List<Matrix4x4> matricesFlower = new List<Matrix4x4>();
@@ -38,12 +43,6 @@ public class GrassRenderer : MonoBehaviour
     private int initialGrassCount; 
     private int currentGrassCount;
     private int flowerCutCount;
-
-
-    //private List<bool> grassCutStatesA = new List<bool>();
-    //private List<bool> grassCutStatesB = new List<bool>();
-    //private int countA = 0;
-    //private int countB = 0;
 
     private void Start()
     {
@@ -166,9 +165,9 @@ public class GrassRenderer : MonoBehaviour
                 //make grass small
                 matricesA[i] = Matrix4x4.TRS(grassPosition, Quaternion.identity, Vector3.one * 0.5f);
                 currentGrassCount--;
+
+                TriggerCutEffect(grassPosition);
             }
-                
-        
         }
 
         //grass B 
@@ -180,10 +179,11 @@ public class GrassRenderer : MonoBehaviour
             {
                 matricesB[i] = Matrix4x4.TRS(grassPosition, Quaternion.identity, Vector3.one * 0.5f);
                 currentGrassCount--;
-            }
-                
 
+                TriggerCutEffect(grassPosition);
+            }      
         }
+
         //flowers
         for (int i = matricesFlower.Count - 1; i >= 0; i--) 
         {
@@ -195,15 +195,42 @@ public class GrassRenderer : MonoBehaviour
                 matricesFlowersCut.Add(Matrix4x4.TRS(flowerPosition, Quaternion.identity, Vector3.one));
                 matricesFlower.RemoveAt(i); //remove the original flower
                 flowerCutCount++;
+                UIManager.Instance.ShowBottomScreenUI("A cold dread crawls over you as you cut the white flower");
             }
         }
-
     }
     public float GetGrassCutPercentage()
     {
         int grassCut = initialGrassCount - currentGrassCount;
 
         return (grassCut / (float)initialGrassCount) * 100f;
+    }
+    private void TriggerCutEffect(Vector3 position)
+    {
+        GameObject effect;
+        if (particlePool.Count > 0)
+        {
+            effect = particlePool.Dequeue();
+            effect.transform.position = position;
+            effect.SetActive(true);
+        }
+        else
+        {
+            effect = Instantiate(cutEffectPrefab, position, Quaternion.identity);
+        }
+
+        ParticleSystem ps = effect.GetComponent<ParticleSystem>();
+        if (ps != null)
+        {
+            ps.Play();
+            StartCoroutine(ReturnParticleToPool(effect, ps.main.duration));
+        }
+    }
+    private IEnumerator ReturnParticleToPool(GameObject effect, float duration)
+    {
+        yield return new WaitForSeconds(duration);
+        effect.SetActive(false);
+        particlePool.Enqueue(effect);
     }
 
 

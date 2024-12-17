@@ -1,7 +1,6 @@
 
 using UnityEngine;
 
-
 public class CameraRayInteracter : MonoBehaviour
 {
 
@@ -35,16 +34,10 @@ public class CameraRayInteracter : MonoBehaviour
                 interactable.OnRayHit();
                  
                 if (Input.GetKeyDown(KeyCode.E))
-                {
-                    //Debug.Log("E pressed");
-                    interactable.Interact();
-                    //HandleInteraction(interactable);
+                    HandleInteraction(interactable);
 
-                }
                 if (Input.GetMouseButtonDown(0)) // Left Mouse Button
-                {
                     HandleToolUsage(interactable);
-                }
             }
         }
         else

@@ -8,5 +8,6 @@ public enum ItemType
     Scissors,
     KeyToA,         
     KeyToB,
-    DoorKnob
+    DoorKnob,
+    Candy
 }

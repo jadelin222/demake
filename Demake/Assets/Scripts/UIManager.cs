@@ -2,6 +2,7 @@ using System;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using System.Collections;
 //using static UnityEngine.Rendering.BoolParameter;
 public class UIManager : MonoBehaviour
 {
@@ -40,6 +41,8 @@ public class UIManager : MonoBehaviour
     public Sprite interactableSprite;
 
     private Action onPickupClosed;  //callback to finalize pickup
+    private Coroutine typewriterCoroutine;
+    private float autoHideDelay = 2f; //typewriter
 
 
     void Awake()
@@ -60,11 +63,35 @@ public class UIManager : MonoBehaviour
         }
 
     }
-    public void ShowBottomScreenUI()
+    /// <summary>
+    /// bottom screenui and type writer fx
+    /// </summary>
+    public void ShowBottomScreenUI(string message)
     {
-        //with type writer fx
-    }
+        // Stop previous typewriter effect if running
+        if (typewriterCoroutine != null)
+        {
+            StopCoroutine(typewriterCoroutine);
+        }
 
+        // Show the UI and start the typewriter effect
+        bottomScreenUI.SetActive(true);
+        bottomScreenText.text = "";  // Clear existing text
+        typewriterCoroutine = StartCoroutine(TypewriterEffect(message));
+    }
+    private IEnumerator TypewriterEffect(string message)
+    {
+        // Display the text character-by-character
+        foreach (char letter in message)
+        {
+            bottomScreenText.text += letter;
+            yield return new WaitForSeconds(0.05f); // Delay between characters
+        }
+
+        // Wait for the specified delay before disabling the UI
+        yield return new WaitForSeconds(autoHideDelay);
+        bottomScreenUI.SetActive(false);
+    }
     /// <summary>
     /// When attempt to pick up item, shows this ui to display info
     /// </summary>

@@ -4,36 +4,46 @@ using UnityEngine;
 
 public class Digable : MonoBehaviour, IInteractable
 {
-    
     public ItemType RequiredItem => ItemType.Shovel;
-    public string InteractionVerb => "Dig";
+    public string InteractionVerb => "Inspect";
     [Header("FX")]
     public ParticleSystem digParticleEffect;
     public float shrinkDuration = 1f; //time taken to shrink and disappear
+    public AudioSource audioSource;
     public AudioClip digSound;
-    private AudioSource audioSource;
+
+    private bool isDigged = false;
+
     private void Start()
     {
         audioSource = GetComponent<AudioSource>();
     }
     public void Interact()
     {
-        if (ToolSystem.Instance.EquippedToolType == RequiredItem)
-        {
+        if (isDigged) return;
+
+        //if player have the right tool equipped, play the break obj sound and break obj
+        if (ToolSystem.Instance.EquippedToolType == RequiredItem && !isDigged)
             DigStuff();
-        }
         else
-        {
-            Debug.Log($"you need a {RequiredItem} equipped to dig this!!!");
-        }
+            UIManager.Instance.ShowBottomScreenUI("You need a Shovel to break this.");
+        
     }
 
     public void OnRayHit()
     {
-        return;
+        if (isDigged) return;
+        //if they dont have the tool, prompt hint to E-inspect, bottom screen UI to find the tool, 
+        if (!ToolSystem.Instance.HasTool(RequiredItem))
+            UIManager.Instance.ShowControlHintUI(InteractionVerb);
     }
     private void DigStuff()
     {
+        isDigged = true;
+
+        // sound
+        PlayDigSound();
+
         //particle
         if (digParticleEffect != null)
         {
@@ -42,11 +52,6 @@ public class Digable : MonoBehaviour, IInteractable
             Destroy(effect.gameObject, 2f); 
         }
 
-       // sound
-        if (digSound != null && audioSource != null)
-        {
-            audioSource.PlayOneShot(digSound);
-        }
         //shrink anim
         StartCoroutine(ShrinkAndDisappear());
     }
@@ -68,5 +73,11 @@ public class Digable : MonoBehaviour, IInteractable
         gameObject.SetActive(false);   
 
         Debug.Log("dirt pile removed!");
+    }
+
+    private void PlayDigSound()
+    {
+        if (audioSource != null && digSound != null)
+            audioSource.PlayOneShot(digSound);
     }
 }
