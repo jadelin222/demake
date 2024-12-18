@@ -18,7 +18,7 @@ public class ToolPropInWorld : MonoBehaviour, IInteractable
 
         Debug.Log($"Picked up {toolObject.name}");
 
-        ToolSystem.Instance.CollectTool(toolObject);
+        //ToolSystem.Instance.CollectTool(toolObject);
         Destroy(gameObject); 
     }
 

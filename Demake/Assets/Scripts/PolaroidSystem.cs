@@ -17,7 +17,7 @@ public class PolaroidSystem : MonoBehaviour
     {
         PolaroidData newPolaroid = new PolaroidData(image, description);
         polaroidCollection.Add(newPolaroid);
-        Debug.Log($"Collected polaroid: {description}");
+        //UIManager.Instance.SetLastCollectedCategory(InventoryCategory.Polaroids);
     }
     public List<PolaroidData> GetPolaroidCollection()
     {

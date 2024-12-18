@@ -17,7 +17,6 @@ public abstract class PickUp : MonoBehaviour, IInteractable
     }
     public void OnRayHit()
     {
-        Debug.Log($"Looking at {itemName}");
         UIManager.Instance.ShowControlHintUI(InteractionVerb);
     }
 

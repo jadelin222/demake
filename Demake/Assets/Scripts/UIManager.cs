@@ -3,7 +3,7 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using System.Collections;
-//using static UnityEngine.Rendering.BoolParameter;
+using System.Collections.Generic;
 public class UIManager : MonoBehaviour
 {
     public static UIManager Instance;
@@ -15,7 +15,6 @@ public class UIManager : MonoBehaviour
     [Header("Pick Up Mask UI")]
     public GameObject pickUpMaskUI;        //main UI for all pickup UI
     public TMP_Text bottomLeftMessage;     //"Obtained {name}"
-    //public GameObject blackBackground;
     public GameObject ItemOrToolUI;
     public GameObject PolaroidUI;
     public GameObject LetterUI;
@@ -23,7 +22,6 @@ public class UIManager : MonoBehaviour
     public Image polaroidImage;
     public TMP_Text polaroidText;
 
-    //public GameObject colsePanellHintUI;
     public TMP_Text closeHintText;
 
     [Header("Bottom Screen UI")]
@@ -40,6 +38,32 @@ public class UIManager : MonoBehaviour
     public Sprite defaultSprite;
     public Sprite interactableSprite;
 
+    [Header("Inventory UI")]
+    public GameObject inventoryUI;
+    public TMP_Text categoryTitle;
+    public GameObject displayPolaroid;
+    public GameObject displayObjOrTool;
+    public TMP_Text objOrToolDescription;
+    public Image objOrToolImage;
+    public TMP_Text polaroidDescription;
+    public Image polaroidInventoryImage;
+    public Transform textListParent; 
+    public GameObject textTemplate;
+
+    [Header("Progress UI")]
+    public GameObject progressUI;
+
+    public List<PolaroidData> polaroidCollection = new List<PolaroidData>();
+    public List<ItemData> itemCollection = new List<ItemData>();
+    public List<ToolData> toolInventory = new List<ToolData>();
+    private List<GameObject> textEntries = new List<GameObject>();
+    public enum InventoryCategory { Polaroids, Items, Tools }
+
+    private int selectedIndex = 0;
+    
+    private InventoryCategory currentCategory;
+    private bool isInventoryOpen = false;
+
     private Action onPickupClosed;  //callback to finalize pickup
     private Coroutine typewriterCoroutine;
     private float autoHideDelay = 2f; //typewriter
@@ -52,9 +76,29 @@ public class UIManager : MonoBehaviour
 
     void Update()
     {
+        //td: update current category according to last pickup 
+
         if (gameTime != null)
         {
             timeTxt.text = gameTime.GetTime();
+        }
+        if (Input.GetKeyDown(KeyCode.Tab) &&!isInventoryOpen)
+        {
+                ShowInventory();
+        }
+        if (isInventoryOpen)
+        {
+            if (Input.GetKeyDown(KeyCode.Q))
+                CloseInventory();
+
+            if (Input.GetKeyDown(KeyCode.RightArrow))
+                SwitchToNextCategory();
+
+            if (Input.GetKeyDown(KeyCode.UpArrow))
+                MoveSelection(-1);
+
+            if (Input.GetKeyDown(KeyCode.DownArrow))
+                MoveSelection(1);
         }
         //close pick-up UI when Q is pressed
         if (pickUpMaskUI.activeSelf && Input.GetKeyDown(KeyCode.Q))
@@ -81,14 +125,14 @@ public class UIManager : MonoBehaviour
     }
     private IEnumerator TypewriterEffect(string message)
     {
-        // Display the text character-by-character
+        //display the text character-by-character
         foreach (char letter in message)
         {
             bottomScreenText.text += letter;
             yield return new WaitForSeconds(0.05f); // Delay between characters
         }
 
-        // Wait for the specified delay before disabling the UI
+        //wait for the specified delay before disabling the UI
         yield return new WaitForSeconds(autoHideDelay);
         bottomScreenUI.SetActive(false);
     }
@@ -193,6 +237,190 @@ public class UIManager : MonoBehaviour
     {
         cursorImage.sprite = interactableSprite;
     }
+    
+    public void ShowProgressUI()
+    {
+        progressUI.SetActive(true); 
+    }
+    public void HideProgressUI()
+    {
+        progressUI.SetActive(false);
+    }
+    /// <summary>
+    /// inventory UI
+    /// </summary>
+    public void ShowInventory()
+    {
+        if (GetCategoryItemCount(InventoryCategory.Polaroids) == 0 &&
+             GetCategoryItemCount(InventoryCategory.Items) == 0 &&
+             GetCategoryItemCount(InventoryCategory.Tools) == 0) return;
+
+        FreezeCamera(); 
+        inventoryUI.SetActive(true);
+        isInventoryOpen = true;
+        PopulateCategory(FindFirstNonEmptyCategory());
+        //PopulateCategory(lastCategory);
+    }
+    public void CloseInventory()
+    {
+        ResumeCamera();
+        inventoryUI.SetActive(false);
+
+        isInventoryOpen = false;
+    }
+    private void PopulateCategory(InventoryCategory category)
+    {
+        currentCategory = category;
+        int itemCount = GetCategoryItemCount(category);
+        if (itemCount == 0) return;
+
+        //update the category title
+        categoryTitle.text = category.ToString() + "  >";
+
+        //toggle the correct display
+        switch (category)
+        {
+            case InventoryCategory.Polaroids:
+                displayPolaroid.SetActive(true);
+                displayObjOrTool.SetActive(false);
+                break;
+
+            case InventoryCategory.Items:
+            case InventoryCategory.Tools:
+                displayPolaroid.SetActive(false);
+                displayObjOrTool.SetActive(true);
+                break;
+        }
+
+        PopulateTextList();
+    }
+    private int GetCategoryItemCount(InventoryCategory category)
+    {
+        switch (category)
+        {
+            case InventoryCategory.Polaroids:
+                return PolaroidSystem.Instance.GetPolaroidCollection().Count;
+
+            case InventoryCategory.Items:
+                return ItemSystem.Instance.GetItemCollection().Count;
+
+            case InventoryCategory.Tools:
+                return ToolSystem.Instance.GetToolCollection().Count;
+
+            default:
+                return 0;
+        }
+    }
+    private InventoryCategory FindFirstNonEmptyCategory()
+    {
+        if (GetCategoryItemCount(InventoryCategory.Tools) > 0)
+            return InventoryCategory.Tools;
+        if (GetCategoryItemCount(InventoryCategory.Polaroids) > 0)
+            return InventoryCategory.Polaroids;
+        if (GetCategoryItemCount(InventoryCategory.Items) > 0)
+            return InventoryCategory.Items;
+
+        return InventoryCategory.Tools; 
+    }
+    private void PopulateTextList()
+    {
+        //clear old text entries
+        foreach (var entry in textEntries)
+        {
+            Destroy(entry);
+        }
+        textEntries.Clear();
+
+        List<string> names = new List<string>();
+
+        //get data based on current category
+        switch (currentCategory)
+        {
+            case InventoryCategory.Polaroids:
+                foreach (var polaroid in PolaroidSystem.Instance.GetPolaroidCollection())
+                    names.Add(polaroid.descriptionText);
+                break;
+
+            case InventoryCategory.Items:
+                foreach (var item in ItemSystem.Instance.GetItemCollection())
+                    names.Add(item.itemType.ToString());
+                break;
+
+            case InventoryCategory.Tools:
+                foreach (var tool in ToolSystem.Instance.GetToolCollection())
+                    names.Add(tool.toolName);
+                break;
+        }
+
+        //generate text elements for names
+        for (int i = 0; i < names.Count; i++)
+        {
+            GameObject textObj = Instantiate(textTemplate, textListParent);
+            TMP_Text tmpText = textObj.GetComponent<TMP_Text>();
+            tmpText.text = names[i];
+            tmpText.color = Color.white;
+            textEntries.Add(textObj);
+        }
+
+        //reset selection
+        selectedIndex = 0;
+        //selectedIndex = Mathf.Clamp(lastSelectedIndex, 0, textEntries.Count - 1);
+        HighlightSelection();
+    }
+
+    private void SwitchToNextCategory()
+    {
+        //currentCategory = (InventoryCategory)(((int)currentCategory + 1) % System.Enum.GetValues(typeof(InventoryCategory)).Length);
+        //PopulateCategory(currentCategory);
+        int totalCategories = System.Enum.GetValues(typeof(InventoryCategory)).Length;
+        int startCategory = (int)currentCategory;
+
+        //cycle to the next non-empty category
+        for (int i = 1; i <= totalCategories; i++)
+        {
+            int nextCategory = (startCategory + i) % totalCategories;
+            if (GetCategoryItemCount((InventoryCategory)nextCategory) > 0)
+            {
+                PopulateCategory((InventoryCategory)nextCategory);
+                return;
+            }
+        }
+    }
+    private void MoveSelection(int direction)
+    {
+        if (textEntries.Count == 0) return;
+        selectedIndex = (selectedIndex + direction) % textEntries.Count;
+
+        HighlightSelection();
+    }
+    private void HighlightSelection()
+    {
+        for (int i = 0; i < textEntries.Count; i++)
+        {
+            TMP_Text tmpText = textEntries[i].GetComponent<TMP_Text>();
+            tmpText.color = (i == selectedIndex) ? Color.white : Color.gray;
+        }
+
+        switch (currentCategory)
+        {
+            case InventoryCategory.Polaroids:
+                PolaroidData polaroidDataObj = PolaroidSystem.Instance.GetPolaroidCollection()[selectedIndex];
+                polaroidDescription.text = polaroidDataObj.descriptionText;
+                polaroidInventoryImage.sprite = polaroidDataObj.imageSprite;
+                break;
+            case InventoryCategory.Items:
+                ItemData itemDataObj = ItemSystem.Instance.GetItemCollection()[selectedIndex];
+                objOrToolDescription.text = itemDataObj.descriptionText;
+                objOrToolImage.sprite = itemDataObj.imageSprite;
+                break;
+            case InventoryCategory.Tools:
+                ToolData toolDataObj = ToolSystem.Instance.GetToolCollection()[selectedIndex];
+                objOrToolDescription.text = toolDataObj.descriptionText;
+                objOrToolImage.sprite = toolDataObj.imageSprite;
+                break;
+        }
+            
+    }
 
     /// <summary>
     /// freeze camera movement by freezing cursor, also hide the cursor point in the middle of screen, freeze time. 
@@ -201,7 +429,8 @@ public class UIManager : MonoBehaviour
     {
         CursorUI.SetActive(false);
         Time.timeScale = 0f;
-        Cursor.lockState = CursorLockMode.None;
+        Cursor.lockState = CursorLockMode.Locked;
+        //Cursor.lockState = CursorLockMode.None;
         Cursor.visible = false;
     }
     //resume camera movement

@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -11,8 +10,8 @@ public class ToolSystem : MonoBehaviour
     public static ToolSystem Instance;
     [SerializeField]
     private List<Tool> toolInventory = new List<Tool>();
+    private List<ToolData> toolCollection = new List<ToolData>();  //metadata for UIs!
     private int currentToolIndex = 0;
-    //private ITool activeTool;
     private Tool activeTool;
     private ItemType equippedItem = ItemType.None; //currently equipped item
 
@@ -29,18 +28,25 @@ public class ToolSystem : MonoBehaviour
         if (Input.GetMouseButtonDown(0))
             UseActiveTool();
     }
-    public void CollectTool(GameObject toolObject)
+    public void CollectTool(GameObject toolObject, Sprite toolImage, string description)
     {
         //ITool tool = toolObject.GetComponent<ITool>();
         Tool tool = toolObject.GetComponent<Tool>();
 
         if (tool != null && !toolInventory.Contains(tool))
         {
-            toolInventory.Add(tool);  
-            Debug.Log($"{toolObject.name} collected and added to inventory");
+            toolInventory.Add(tool);
+            //Debug.Log($"{toolObject.name} collected and added to inventory");
+            toolCollection.Add(new ToolData(tool.toolName, toolImage, description));
+
+
             //EquipTool(currentToolIndex);
             EquipTool(toolInventory.Count - 1);
         }
+    }
+    public List<ToolData> GetToolCollection()
+    {
+        return toolCollection;
     }
 
     public void EquipTool(int toolIndex)
