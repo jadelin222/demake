@@ -53,15 +53,18 @@ public class UIManager : MonoBehaviour
     [Header("Progress UI")]
     public GameObject progressUI;
 
-    public List<PolaroidData> polaroidCollection = new List<PolaroidData>();
-    public List<ItemData> itemCollection = new List<ItemData>();
-    public List<ToolData> toolInventory = new List<ToolData>();
+    [Header("CutScene UI")]
+    public GameObject cutSceneUI;
+    public GameObject newDayUI;
+    public TMP_Text newDayText;
+    public GameObject endGameUI;
+    public TMP_Text endGameText;
+    public bool isCutsceneActive = false;
+
     private List<GameObject> textEntries = new List<GameObject>();
-    public enum InventoryCategory { Polaroids, Items, Tools }
 
     private int selectedIndex = 0;
-    
-    private InventoryCategory currentCategory;
+    private InventoryManager.InventoryCategory currentCategory;
     private bool isInventoryOpen = false;
 
     private Action onPickupClosed;  //callback to finalize pickup
@@ -79,13 +82,9 @@ public class UIManager : MonoBehaviour
         //td: update current category according to last pickup 
 
         if (gameTime != null)
-        {
             timeTxt.text = gameTime.GetTime();
-        }
         if (Input.GetKeyDown(KeyCode.Tab) &&!isInventoryOpen)
-        {
                 ShowInventory();
-        }
         if (isInventoryOpen)
         {
             if (Input.GetKeyDown(KeyCode.Q))
@@ -102,9 +101,7 @@ public class UIManager : MonoBehaviour
         }
         //close pick-up UI when Q is pressed
         if (pickUpMaskUI.activeSelf && Input.GetKeyDown(KeyCode.Q))
-        {
             HidePickupUI();
-        }
 
     }
     /// <summary>
@@ -112,29 +109,37 @@ public class UIManager : MonoBehaviour
     /// </summary>
     public void ShowBottomScreenUI(string message)
     {
-        // Stop previous typewriter effect if running
+        //stop previous typewriter effect if running
         if (typewriterCoroutine != null)
         {
             StopCoroutine(typewriterCoroutine);
         }
 
-        // Show the UI and start the typewriter effect
         bottomScreenUI.SetActive(true);
-        bottomScreenText.text = "";  // Clear existing text
-        typewriterCoroutine = StartCoroutine(TypewriterEffect(message));
+        typewriterCoroutine = StartCoroutine(TypewriterEffect(bottomScreenText, message, autoHideDelay));
     }
-    private IEnumerator TypewriterEffect(string message)
+    private IEnumerator TypewriterEffect(TMP_Text textComponent, string message, float delayAfter = 0f)
     {
-        //display the text character-by-character
-        foreach (char letter in message)
+        textComponent.text = ""; //clear existing text
+        string[] lines = message.Split('.');
+        foreach (string line in lines)
         {
-            bottomScreenText.text += letter;
-            yield return new WaitForSeconds(0.05f); // Delay between characters
+            if (string.IsNullOrWhiteSpace(line)) continue;
+            textComponent.text = ""; //reset for each line
+            
+            foreach (char letter in line.Trim())
+            {
+                textComponent.text += letter;
+                yield return new WaitForSeconds(0.05f); //typing effect speed
+            }
+            yield return new WaitForSeconds(1f); //pause after a line
         }
 
         //wait for the specified delay before disabling the UI
-        yield return new WaitForSeconds(autoHideDelay);
-        bottomScreenUI.SetActive(false);
+        if (delayAfter > 0f)
+        {
+            yield return new WaitForSeconds(delayAfter);
+        }
     }
     /// <summary>
     /// When attempt to pick up item, shows this ui to display info
@@ -251,14 +256,13 @@ public class UIManager : MonoBehaviour
     /// </summary>
     public void ShowInventory()
     {
-        if (GetCategoryItemCount(InventoryCategory.Polaroids) == 0 &&
-             GetCategoryItemCount(InventoryCategory.Items) == 0 &&
-             GetCategoryItemCount(InventoryCategory.Tools) == 0) return;
+        if (pickUpMaskUI.activeSelf) return; //prevent opening inventory if PickUp UI is active
+        if (InventoryManager.Instance.IsInventoryEmpty()) return; //prevent opening inventory if empty
 
         FreezeCamera(); 
         inventoryUI.SetActive(true);
         isInventoryOpen = true;
-        PopulateCategory(FindFirstNonEmptyCategory());
+        PopulateCategory(InventoryManager.Instance.FindFirstNonEmptyCategory());
         //PopulateCategory(lastCategory);
     }
     public void CloseInventory()
@@ -268,10 +272,11 @@ public class UIManager : MonoBehaviour
 
         isInventoryOpen = false;
     }
-    private void PopulateCategory(InventoryCategory category)
+    private void PopulateCategory(InventoryManager.InventoryCategory category)
     {
         currentCategory = category;
-        int itemCount = GetCategoryItemCount(category);
+        //int itemCount = GetCategoryItemCount(category);
+        int itemCount = InventoryManager.Instance.GetCategoryCount(category);
         if (itemCount == 0) return;
 
         //update the category title
@@ -280,47 +285,19 @@ public class UIManager : MonoBehaviour
         //toggle the correct display
         switch (category)
         {
-            case InventoryCategory.Polaroids:
+            case InventoryManager.InventoryCategory.Polaroids:
                 displayPolaroid.SetActive(true);
                 displayObjOrTool.SetActive(false);
                 break;
 
-            case InventoryCategory.Items:
-            case InventoryCategory.Tools:
+            case InventoryManager.InventoryCategory.Items:
+            case InventoryManager.InventoryCategory.Tools:
                 displayPolaroid.SetActive(false);
                 displayObjOrTool.SetActive(true);
                 break;
         }
 
         PopulateTextList();
-    }
-    private int GetCategoryItemCount(InventoryCategory category)
-    {
-        switch (category)
-        {
-            case InventoryCategory.Polaroids:
-                return PolaroidSystem.Instance.GetPolaroidCollection().Count;
-
-            case InventoryCategory.Items:
-                return ItemSystem.Instance.GetItemCollection().Count;
-
-            case InventoryCategory.Tools:
-                return ToolSystem.Instance.GetToolCollection().Count;
-
-            default:
-                return 0;
-        }
-    }
-    private InventoryCategory FindFirstNonEmptyCategory()
-    {
-        if (GetCategoryItemCount(InventoryCategory.Tools) > 0)
-            return InventoryCategory.Tools;
-        if (GetCategoryItemCount(InventoryCategory.Polaroids) > 0)
-            return InventoryCategory.Polaroids;
-        if (GetCategoryItemCount(InventoryCategory.Items) > 0)
-            return InventoryCategory.Items;
-
-        return InventoryCategory.Tools; 
     }
     private void PopulateTextList()
     {
@@ -331,26 +308,8 @@ public class UIManager : MonoBehaviour
         }
         textEntries.Clear();
 
-        List<string> names = new List<string>();
-
-        //get data based on current category
-        switch (currentCategory)
-        {
-            case InventoryCategory.Polaroids:
-                foreach (var polaroid in PolaroidSystem.Instance.GetPolaroidCollection())
-                    names.Add(polaroid.descriptionText);
-                break;
-
-            case InventoryCategory.Items:
-                foreach (var item in ItemSystem.Instance.GetItemCollection())
-                    names.Add(item.itemType.ToString());
-                break;
-
-            case InventoryCategory.Tools:
-                foreach (var tool in ToolSystem.Instance.GetToolCollection())
-                    names.Add(tool.toolName);
-                break;
-        }
+        //List<string> names = new List<string>();
+        List<string> names = InventoryManager.Instance.GetNames(currentCategory);
 
         //generate text elements for names
         for (int i = 0; i < names.Count; i++)
@@ -361,7 +320,6 @@ public class UIManager : MonoBehaviour
             tmpText.color = Color.white;
             textEntries.Add(textObj);
         }
-
         //reset selection
         selectedIndex = 0;
         //selectedIndex = Mathf.Clamp(lastSelectedIndex, 0, textEntries.Count - 1);
@@ -370,18 +328,16 @@ public class UIManager : MonoBehaviour
 
     private void SwitchToNextCategory()
     {
-        //currentCategory = (InventoryCategory)(((int)currentCategory + 1) % System.Enum.GetValues(typeof(InventoryCategory)).Length);
-        //PopulateCategory(currentCategory);
-        int totalCategories = System.Enum.GetValues(typeof(InventoryCategory)).Length;
+        int totalCategories = System.Enum.GetValues(typeof(InventoryManager.InventoryCategory)).Length;
         int startCategory = (int)currentCategory;
 
         //cycle to the next non-empty category
         for (int i = 1; i <= totalCategories; i++)
         {
             int nextCategory = (startCategory + i) % totalCategories;
-            if (GetCategoryItemCount((InventoryCategory)nextCategory) > 0)
+            if (InventoryManager.Instance.GetCategoryCount((InventoryManager.InventoryCategory)nextCategory) > 0)
             {
-                PopulateCategory((InventoryCategory)nextCategory);
+                PopulateCategory((InventoryManager.InventoryCategory)nextCategory);
                 return;
             }
         }
@@ -400,26 +356,70 @@ public class UIManager : MonoBehaviour
             TMP_Text tmpText = textEntries[i].GetComponent<TMP_Text>();
             tmpText.color = (i == selectedIndex) ? Color.white : Color.gray;
         }
-
+        var metaData = InventoryManager.Instance.GetMetaData(currentCategory, selectedIndex);
         switch (currentCategory)
         {
-            case InventoryCategory.Polaroids:
-                PolaroidData polaroidDataObj = PolaroidSystem.Instance.GetPolaroidCollection()[selectedIndex];
+            case InventoryManager.InventoryCategory.Polaroids:
+                PolaroidData polaroidDataObj = (PolaroidData)metaData;
                 polaroidDescription.text = polaroidDataObj.descriptionText;
                 polaroidInventoryImage.sprite = polaroidDataObj.imageSprite;
                 break;
-            case InventoryCategory.Items:
-                ItemData itemDataObj = ItemSystem.Instance.GetItemCollection()[selectedIndex];
+            case InventoryManager.InventoryCategory.Items:
+                ItemData itemDataObj = (ItemData)metaData;
                 objOrToolDescription.text = itemDataObj.descriptionText;
                 objOrToolImage.sprite = itemDataObj.imageSprite;
                 break;
-            case InventoryCategory.Tools:
-                ToolData toolDataObj = ToolSystem.Instance.GetToolCollection()[selectedIndex];
+            case InventoryManager.InventoryCategory.Tools:
+                ToolData toolDataObj = (ToolData)metaData;
                 objOrToolDescription.text = toolDataObj.descriptionText;
                 objOrToolImage.sprite = toolDataObj.imageSprite;
                 break;
-        }
-            
+        }     
+    }
+    /// <summary>
+    /// game over UI for win/lose
+    /// </summary>
+    public void ShowCutSceneUI()
+    {
+        cutSceneUI.SetActive(true);
+    }
+    public void ShowDayCutScene(string day)
+    {
+        if (isCutsceneActive) return; //prevent starting another cutscene if already active
+        //FadeManager.Instance.FadeIn();
+        FadeManager.Instance.FadeIn(() =>
+        {
+            isCutsceneActive = true;
+            FreezeCamera();
+            ShowCutSceneUI();
+            newDayUI.SetActive(true);
+            endGameUI.SetActive(false);
+            newDayText.text = day;
+            StartCoroutine(HideDayCutSceneAfterDelay(2f));
+        });
+    }
+    private IEnumerator HideDayCutSceneAfterDelay(float delay)
+    {
+        //yield return new WaitForSeconds(delay);
+        yield return new WaitForSecondsRealtime(delay);
+        FadeManager.Instance.FadeOut();
+        newDayUI.SetActive(false);
+        cutSceneUI.SetActive(false);
+        ResumeCamera();
+        isCutsceneActive = false;
+    }
+    public void ShowGameOverUI(string message)
+    {
+        ShowCutSceneUI();
+        newDayUI.SetActive(false);
+        endGameUI.SetActive(true);
+        StartCoroutine(PlayGameOverText(message));
+    }
+
+    private IEnumerator PlayGameOverText(string message)
+    {
+        yield return TypewriterEffect(endGameText, message, 1.5f); //use the typewriter effect with a delay after
+        //restartHint.SetActive(true);
     }
 
     /// <summary>

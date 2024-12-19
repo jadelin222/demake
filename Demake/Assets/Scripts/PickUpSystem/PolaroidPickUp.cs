@@ -23,7 +23,9 @@ public class PolaroidPickUp : PickUp
     }
     public override void FinalizePickup()
     {
-        PolaroidSystem.Instance.CollectPolaroid(image, descriptionText);
+        //PolaroidSystem.Instance.CollectPolaroid(image, descriptionText);
+        PolaroidData polaroidData = new PolaroidData(image, descriptionText);
+        InventoryManager.Instance.AddPolaroid(polaroidData);
         Destroy(gameObject);
     }
 

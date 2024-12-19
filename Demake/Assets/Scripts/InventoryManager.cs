@@ -1,12 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static UIManager;
+//using static UIManager;
 
 public class InventoryManager : MonoBehaviour
 {
     public static InventoryManager Instance;
-
+    public enum InventoryCategory { Polaroids, Items, Tools }
     private List<PolaroidData> polaroidCollection = new List<PolaroidData>();
     private List<ItemData> itemCollection = new List<ItemData>();
     private List<ToolData> toolCollection = new List<ToolData>();
@@ -20,17 +20,14 @@ public class InventoryManager : MonoBehaviour
     {
         polaroidCollection.Add(polaroid);
     }
-
     public void AddItem(ItemData item)
     {
         itemCollection.Add(item);
     }
-
     public void AddTool(ToolData tool)
     {
         toolCollection.Add(tool);
     }
-
     public int GetCategoryCount(InventoryCategory category)
     {
         switch (category)
@@ -44,7 +41,6 @@ public class InventoryManager : MonoBehaviour
             default: return 0;
         }
     }
-
     public List<string> GetNames(InventoryCategory category)
     {
         List<string> names = new List<string>();
@@ -67,7 +63,6 @@ public class InventoryManager : MonoBehaviour
 
         return names;
     }
-
     public object GetMetaData(InventoryCategory category, int index)
     {
         switch (category)
@@ -83,8 +78,22 @@ public class InventoryManager : MonoBehaviour
         }
     }
 
-    //public bool InventoryEmpty()
-    //{
+    public InventoryCategory FindFirstNonEmptyCategory()
+    {
+        if (GetCategoryCount(InventoryCategory.Tools) > 0)
+            return InventoryCategory.Tools;
+        if (GetCategoryCount(InventoryCategory.Polaroids) > 0)
+            return InventoryCategory.Polaroids;
+        if (GetCategoryCount(InventoryCategory.Items) > 0)
+            return InventoryCategory.Items;
 
-    //}
+        return InventoryCategory.Tools;
+    }
+
+    public bool IsInventoryEmpty()
+    {
+        return GetCategoryCount(InventoryCategory.Polaroids) == 0 &&
+               GetCategoryCount(InventoryCategory.Items) == 0 &&
+               GetCategoryCount(InventoryCategory.Tools) == 0;
+    }
 }

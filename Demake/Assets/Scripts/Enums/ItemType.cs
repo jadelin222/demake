@@ -6,6 +6,7 @@ public enum ItemType
     Shovel,
     WateringCan,
     Scissors,
+    Trumpet,
     KeyToA,         
     KeyToB,
     DoorKnob,

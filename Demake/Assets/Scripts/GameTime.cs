@@ -8,9 +8,10 @@ public class GameTime : MonoBehaviour
     [Header("Time")]
     public float dayLength = 600f; // in seconds
     public float inGameTime = 8f / 24f;
-    //[Header("UI")]
-    //[SerializeField]
-    //private TMP_Text timeTxt; //move to ui manager
+
+    [Header("Days")]
+    private string[] daysOfWeek = { "Friday", "Saturday", "Sunday" };
+    private int currentDayIndex = 0;
 
     void Update()
     {
@@ -19,6 +20,7 @@ public class GameTime : MonoBehaviour
         if (inGameTime >= 1)
         {
             inGameTime = 0;
+            currentDayIndex = (currentDayIndex + 1) % daysOfWeek.Length;
         }
 
     }
@@ -28,5 +30,14 @@ public class GameTime : MonoBehaviour
         int hourInt = Mathf.FloorToInt(hours);
         int minutes = Mathf.FloorToInt((hours - hourInt) * 60);
         return $"{hourInt:D2}:{minutes:D2}";
+    }
+    public string GetDay()
+    {
+        return daysOfWeek[currentDayIndex];
+    }
+    public void SetTimeToNextDay(float time)
+    {
+        inGameTime = time;
+        currentDayIndex = (currentDayIndex + 1) % daysOfWeek.Length;
     }
 }

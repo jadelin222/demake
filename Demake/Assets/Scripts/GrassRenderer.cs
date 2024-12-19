@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static GameMaster;
 
 [System.Serializable]
 public class SurfaceSettings
@@ -196,6 +197,11 @@ public class GrassRenderer : MonoBehaviour
                 matricesFlower.RemoveAt(i); //remove the original flower
                 flowerCutCount++;
                 UIManager.Instance.ShowBottomScreenUI("A cold dread crawls over you as you cut the white flower");
+            }
+            if (flowerCutCount > 4)
+            {
+                //GameMaster.Instance.TriggerEnding(GameMaster.Endings.CutTooManyFlowers);
+                FadeManager.Instance.FadeIn(() => GameMaster.Instance.TriggerEnding(Endings.CutTooManyFlowers));
             }
         }
     }

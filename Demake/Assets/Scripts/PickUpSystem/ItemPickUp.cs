@@ -21,8 +21,8 @@ public class ItemPickUp : PickUp
     }
     public override void FinalizePickup()
     {
-        // Add the item to the inventory
-        ItemSystem.Instance.CollectItem(image, descriptionText, itemType);
+        ItemData itemData = new ItemData(image, descriptionText, itemType);
+        InventoryManager.Instance.AddItem(itemData);
         Destroy(gameObject);
     }
 

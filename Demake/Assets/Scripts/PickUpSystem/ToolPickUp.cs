@@ -27,6 +27,8 @@ public class ToolPickUp : PickUp
         if (toolObject != null)
         {
             ToolSystem.Instance.CollectTool(toolObject, image, descriptionText);
+            ToolData toolData = new ToolData(toolObject.name, image, descriptionText);
+            InventoryManager.Instance.AddTool(toolData);
         }
         Destroy(gameObject);
     }
