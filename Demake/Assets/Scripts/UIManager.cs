@@ -138,7 +138,8 @@ public class UIManager : MonoBehaviour
         //wait for the specified delay before disabling the UI
         if (delayAfter > 0f)
         {
-            yield return new WaitForSeconds(delayAfter);
+            yield return new WaitForSeconds(delayAfter); 
+            bottomScreenUI.SetActive(false);
         }
     }
     /// <summary>
