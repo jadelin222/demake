@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -16,6 +17,10 @@ public class ToolSystem : MonoBehaviour
     private ItemType equippedItem = ItemType.None; //currently equipped item
 
     public ItemType EquippedToolType => equippedItem;
+
+    //[Header("Animation Settings")]
+    //public Animator toolAnimator;
+
     void Awake()
     {
         Instance = this;
@@ -51,48 +56,70 @@ public class ToolSystem : MonoBehaviour
 
     public void EquipTool(int toolIndex)
     {
-        if (toolInventory.Count == 0) return; 
+        if (toolInventory.Count == 0) return;
+        //StartCoroutine(SwitchTool(toolIndex));
+        //toolAnimator.SetTrigger("ShowTool");
 
         currentToolIndex = toolIndex % toolInventory.Count;
 
         if (activeTool != null)
-        {
             activeTool.gameObject.SetActive(false);
-        }
 
         activeTool = toolInventory[currentToolIndex];
         equippedItem = activeTool.ToolType;  //update current equipped tool
         activeTool.ResetToolStatus();
         Debug.Log($"{activeTool.ToolType} equipped");
-        //Debug.Log($"{activeTool.name} equipped");
+        //show animator
+
     }
+    //private IEnumerator SwitchTool(int toolIndex)
+    //{
+    //    if (activeTool != null)
+    //    {
+    //        toolAnimator.SetTrigger("HideTool");
+    //        yield return new WaitForSeconds(0.8f); // Adjust this duration to match your hide animation length
+    //        activeTool.gameObject.SetActive(false);
+    //    }
+
+    //    currentToolIndex = toolIndex % toolInventory.Count;
+    //    activeTool = toolInventory[currentToolIndex];
+    //    equippedItem = activeTool.ToolType;  //update current equipped tool
+    //    activeTool.ResetToolStatus();
+    //    Debug.Log($"{activeTool.ToolType} equipped");
+
+    //    toolAnimator.SetTrigger("ShowTool");
+    //    activeTool.gameObject.SetActive(true);
+    //}
     public void UseActiveTool()
     {
         if (activeTool != null)
-        {
+        { 
             if (!activeTool.gameObject.activeSelf)
             {
                 activeTool.ResetToolStatus(); // show and reset the tool if it was put away
             }
+               
             activeTool.ActivateTool();
             //activeTool.UseTool();
         }
-        else
-        {
-            Debug.Log("No tool equipped");
-            return;
-        }
+        else return;
     }
     public void CycleToNextTool()
     {
         if (toolInventory.Count == 0) return;
         currentToolIndex = (currentToolIndex + 1) % toolInventory.Count;
         EquipTool(currentToolIndex);
+        //ad animation
     }
 
     public void PutAwayActiveTool()
     {
-        if (activeTool != null) activeTool.PutAway();
+        if (activeTool != null) 
+        {
+            //toolAnimator.SetTrigger("HideTool");
+            activeTool.PutAway();
+        }
+
     }
 
     public bool HasTool(ItemType itemType)

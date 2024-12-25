@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public enum ToolState
@@ -18,7 +19,7 @@ public abstract class Tool : MonoBehaviour
 
     [Header("Animation Settings")]
     public Animator animator;
-
+    public Animator HideNShowAnimator;
 
     public float maxIdleTime = 5f;
     public float coolDownTime = 1f;
@@ -62,6 +63,8 @@ public abstract class Tool : MonoBehaviour
         currentState = state;
         if (animator != null)
             animator.SetBool("IsIdle", state == ToolState.Idle);
+        if(HideNShowAnimator != null)
+            HideNShowAnimator.SetBool("IsInUse", state == ToolState.InUse);
     }
     public void ResetToolStatus()
     {
@@ -73,8 +76,7 @@ public abstract class Tool : MonoBehaviour
     public virtual void PutAway()
     {
         isHiding = true;
-        //PlayHideAnim();
-        gameObject.SetActive(false);
+        StartCoroutine(PlayHideAnimation());
     }
     public bool CanUse() //if its on cd
     {
@@ -88,8 +90,8 @@ public abstract class Tool : MonoBehaviour
 
     protected virtual void ShowTool()
     {
-        Debug.Log("equipt anim played");
-//play anim
+        //play anim
+        HideNShowAnimator.SetTrigger("ShowTool");
         gameObject.SetActive(true);
         isHiding = false;
         SetState(ToolState.Idle);
@@ -102,12 +104,16 @@ public abstract class Tool : MonoBehaviour
             SetState(ToolState.InUse);
         }
     }
-    //protected void PlayHideAnim()
-    //{
-    //    if (animator != null)
-    //        animator.SetTrigger("PutAway");
-    //}
-
+    protected void PlayHideAnim()
+    {
+        HideNShowAnimator.SetTrigger("HideTool");
+    }
+    private IEnumerator PlayHideAnimation()
+    {
+        PlayHideAnim();
+        yield return new WaitForSeconds(2f);
+        gameObject.SetActive(false);
+    }
     protected void PlayHitSound()
     {
         if (audioSource != null && hitClip != null)

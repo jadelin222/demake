@@ -72,7 +72,6 @@ public class Digable : MonoBehaviour, IInteractable
         transform.localScale = Vector3.zero; 
         gameObject.SetActive(false);   
 
-        Debug.Log("dirt pile removed!");
     }
 
     private void PlayDigSound()

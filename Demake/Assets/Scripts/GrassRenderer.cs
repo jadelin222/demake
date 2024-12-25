@@ -28,9 +28,11 @@ public class GrassRenderer : MonoBehaviour
     public List<SurfaceSettings> spawnSurfaces; //list of surfaces to spawn grass/grass+flowers on
 
     [Header("Particle Effect")]
-    public GameObject cutEffectPrefab; // Prefab of the particle effect to play
+    public GameObject cutEffectPrefab;
+    public GameObject groundEffectPrefab;
     private List<ParticleSystem> activeParticles = new List<ParticleSystem>();
-    private Queue<GameObject> particlePool = new Queue<GameObject>(); //pooling
+    private Queue<GameObject> cutEffectPool = new Queue<GameObject>(); //pooling for cut effects
+    private Queue<GameObject> groundEffectPool = new Queue<GameObject>(); //pooling for ground effect
 
 
     private List<Matrix4x4> matricesA = new List<Matrix4x4>(); //grass
@@ -163,6 +165,9 @@ public class GrassRenderer : MonoBehaviour
 
             if (Vector3.Distance(grassPosition, cutPosition) <= radius)
             {
+                //check if the grass is already cut
+                if (matricesA[i].lossyScale == Vector3.one * 0.5f)
+                    continue;
                 //make grass small
                 matricesA[i] = Matrix4x4.TRS(grassPosition, Quaternion.identity, Vector3.one * 0.5f);
                 currentGrassCount--;
@@ -178,6 +183,8 @@ public class GrassRenderer : MonoBehaviour
 
             if (Vector3.Distance(grassPosition, cutPosition) <= radius)
             {
+                if (matricesB[i].lossyScale == Vector3.one * 0.5f)
+                    continue;
                 matricesB[i] = Matrix4x4.TRS(grassPosition, Quaternion.identity, Vector3.one * 0.5f);
                 currentGrassCount--;
 
@@ -213,32 +220,64 @@ public class GrassRenderer : MonoBehaviour
     }
     private void TriggerCutEffect(Vector3 position)
     {
-        GameObject effect;
-        if (particlePool.Count > 0)
+        //cut effect
+        GameObject cutEffect = InstantiateEffect(cutEffectPrefab, position, cutEffectPool);
+        ParticleSystem cutPs = cutEffect.GetComponent<ParticleSystem>();
+        if (cutPs != null)
         {
-            effect = particlePool.Dequeue();
+            cutPs.Play();
+            StartCoroutine(ReturnParticleToPool(cutEffect, cutPs.main.duration, cutEffectPool));
+        }
+
+        //ground effect
+        GameObject groundEffect = InstantiateEffect(groundEffectPrefab, position, groundEffectPool);
+        ParticleSystem groundPs = groundEffect.GetComponent<ParticleSystem>();
+        if (groundPs != null)
+        {
+            groundPs.Play();
+            StartCoroutine(ReturnParticleToPool(groundEffect, groundPs.main.duration, groundEffectPool));
+        }
+        //GameObject effect;
+        //if (particlePool.Count > 0)
+        //{
+        //    effect = particlePool.Dequeue();
+        //    effect.transform.position = position;
+        //    effect.SetActive(true);
+        //}
+        //else
+        //{
+        //    effect = Instantiate(cutEffectPrefab, position, Quaternion.identity);
+        //}
+
+        //ParticleSystem ps = effect.GetComponent<ParticleSystem>();
+        //if (ps != null)
+        //{
+        //    ps.Play();
+        //    StartCoroutine(ReturnParticleToPool(effect, ps.main.duration));
+        //}
+    }
+    private GameObject InstantiateEffect(GameObject effectPrefab, Vector3 position, Queue<GameObject> pool)
+    {
+        GameObject effect;
+        if (pool.Count > 0)
+        {
+            effect = pool.Dequeue();
             effect.transform.position = position;
             effect.SetActive(true);
         }
         else
         {
-            effect = Instantiate(cutEffectPrefab, position, Quaternion.identity);
+            effect = Instantiate(effectPrefab, position, Quaternion.identity);
         }
-
-        ParticleSystem ps = effect.GetComponent<ParticleSystem>();
-        if (ps != null)
-        {
-            ps.Play();
-            StartCoroutine(ReturnParticleToPool(effect, ps.main.duration));
-        }
+        return effect;
     }
-    private IEnumerator ReturnParticleToPool(GameObject effect, float duration)
+
+    private IEnumerator ReturnParticleToPool(GameObject effect, float duration, Queue<GameObject> pool)
     {
         yield return new WaitForSeconds(duration);
         effect.SetActive(false);
-        particlePool.Enqueue(effect);
+        pool.Enqueue(effect);
     }
-
 
     //private void SpawnGrassOnSurface(MeshFilter surface)
     //{
