@@ -18,6 +18,9 @@ public class UIManager : MonoBehaviour
     public GameObject ItemOrToolUI;
     public GameObject PolaroidUI;
     public GameObject LetterUI;
+    public GameObject polaroidPrefab;
+    public GameObject letterPrefab;
+    public GameObject itemToolPrefab;
     public TMP_Text letterText;
     public Image polaroidImage;
     public TMP_Text polaroidText;
@@ -191,11 +194,26 @@ public class UIManager : MonoBehaviour
 
         ResumeCamera();
     }
+    //private IEnumerator AnimatePickUpPanel(GameObject UIPrefab,Vector3 startPosition, Vector3 endPosition, float duration)
+    private IEnumerator AnimatePickUpPanel(GameObject UIPrefab, float duration)
+    {
+        float time = 0f;
+        Vector3 startPosition = new Vector3(UIPrefab.transform.position.x, -Screen.height, UIPrefab.transform.position.z);
+        Vector3 endPosition = UIPrefab.transform.position;
+        while (time < duration)
+        {
+            UIPrefab.transform.position = Vector3.Lerp(startPosition, endPosition, time / duration);
+            time += Time.unscaledDeltaTime;
+            yield return null;
+        }
+        UIPrefab.transform.position = endPosition;
+    }
     public void ShowItemOrToolUI(PickupData uiData)
     {
         ItemOrToolUI.SetActive(true);
         bottomLeftMessage.text = uiData.bottomMessage;
         closeHintText.text = $"Q - {uiData.actionVerb}";
+        StartCoroutine(AnimatePickUpPanel(itemToolPrefab, 0.5f));
 
     }
     public void ShowLetterUI(PickupData uiData)
@@ -204,6 +222,7 @@ public class UIManager : MonoBehaviour
         bottomLeftMessage.text = uiData.bottomMessage;
         letterText.text = uiData.descriptionText;
         closeHintText.text = $"Q - {uiData.actionVerb}";
+        StartCoroutine(AnimatePickUpPanel(letterPrefab, 0.5f));
 
     }
     public void ShowPolaroidUI(PickupData uiData)
@@ -214,6 +233,10 @@ public class UIManager : MonoBehaviour
 
         polaroidImage.sprite = uiData.imageSprite;
         polaroidText.text = uiData.descriptionText;
+
+        //Vector3 startPosition = new Vector3(polaroidPrefab.transform.position.x, -Screen.height, polaroidPrefab.transform.position.z);
+        //Vector3 endPosition = polaroidPrefab.transform.position;
+        StartCoroutine(AnimatePickUpPanel(polaroidPrefab, 0.5f));
     }
     /// <summary>
     /// the control hint shown when raycast hit interactable object
