@@ -23,6 +23,7 @@ public class ItemPickUp : PickUp
     {
         ItemData itemData = new ItemData(image, descriptionText, itemType);
         InventoryManager.Instance.AddItem(itemData);
+        ItemSystem.Instance.CollectItem(image, descriptionText, itemType);
         Destroy(gameObject);
     }
 

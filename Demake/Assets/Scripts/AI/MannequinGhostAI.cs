@@ -55,6 +55,7 @@ public class MannequinGhostAI : MonoBehaviour
     {
         agent.SetDestination(player.position);
         currentState = GhostState.Chasing;
+        animator.SetTrigger("walk");
         agent.isStopped = false;
     }
     private void StopChase()
@@ -79,7 +80,7 @@ public class MannequinGhostAI : MonoBehaviour
     }
     public void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (other.CompareTag("Player") && currentState == GhostState.Chasing)
         {
             //Endings endingType = Endings.CaughtByGhosts;
             //GameMaster.Instance.TriggerEnding(endingType);
@@ -93,7 +94,7 @@ public class MannequinGhostAI : MonoBehaviour
         transform.position = playerPosition + player.forward * 2f;
         transform.LookAt(player);
 
-        //animator.SetTrigger("Scare");
+        animator.SetTrigger("jumpScare");
 
         yield return new WaitForSeconds(2f);
 

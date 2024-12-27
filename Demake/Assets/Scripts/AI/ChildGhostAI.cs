@@ -38,13 +38,16 @@ public class ChildGhostAI : MonoBehaviour, IInteractable
     public void Interact()
     {
         bool hasRequiredItem = ItemSystem.Instance.HasItem(ItemType.Candy);
+       Debug.Log(hasRequiredItem);
         if (currentState == ChildState.Idle) 
         {
+            animator.SetTrigger("isSitSpeaking");
             UIManager.Instance.ShowBottomScreenUI("i have been waiting for mum forever");
             currentState = ChildState.WaitingForItem;
         }
         else if(currentState == ChildState.WaitingForItem && !hasRequiredItem)
         {
+            animator.SetTrigger("isSitSpeaking");
             UIManager.Instance.ShowBottomScreenUI("Bring me the thing please");
         }
         if (currentState == ChildState.WaitingForItem && hasRequiredItem)
@@ -61,6 +64,7 @@ public class ChildGhostAI : MonoBehaviour, IInteractable
     private void LeadWay()
     {
         agent.isStopped = false;
+        animator.SetTrigger("StandNWalk");
         //animation td
         agent.SetDestination(destinationPoint.position);
         PlayWalkAnimation();
@@ -80,6 +84,7 @@ public class ChildGhostAI : MonoBehaviour, IInteractable
     private void StopAndWait()
     {
         currentState = ChildState.WaitingForPlayer;
+        animator.SetTrigger("StandWaiting");
         agent.isStopped = true;
         PlayWaitingAnimation();
     }
@@ -109,10 +114,12 @@ public class ChildGhostAI : MonoBehaviour, IInteractable
     private void PlayWaitingAnimation()
     {
         //standing and wait 
+        Debug.Log("Waiting");
     }
 
     private void PlayWalkAnimation()
     {
         //keep walking
+        Debug.Log("Walking");   
     }
 }

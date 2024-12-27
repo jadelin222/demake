@@ -195,25 +195,78 @@ public class UIManager : MonoBehaviour
         ResumeCamera();
     }
     //private IEnumerator AnimatePickUpPanel(GameObject UIPrefab,Vector3 startPosition, Vector3 endPosition, float duration)
-    private IEnumerator AnimatePickUpPanel(GameObject UIPrefab, float duration)
+    //private IEnumerator AnimatePickUpPanel(GameObject UIPrefab, float duration)
+    //{
+    //    float time = 0f;
+    //    Vector3 startPosition = new Vector3(UIPrefab.transform.position.x, -Screen.height, UIPrefab.transform.position.z);
+    //    Vector3 endPosition = UIPrefab.transform.position;
+    //    Vector3 overshootPosition = endPosition + new Vector3(0, 50, 0); 
+
+    //    while (time < duration)
+    //    {
+    //        float t = time / duration;
+    //        float easedT = Ease(t);
+    //        UIPrefab.transform.position = Vector3.Lerp(startPosition, overshootPosition, easedT);
+
+    //        //UIPrefab.transform.position = Vector3.Lerp(startPosition, endPosition, time / duration);
+    //        time += Time.unscaledDeltaTime;
+    //        yield return null;
+    //    }
+
+    //    UIPrefab.transform.position = endPosition;
+    //}
+    private IEnumerator AnimatePickUpPanel(GameObject uiObject, float slideDuration)
     {
+        float overshootAmount = 20f;//in px
+        float wobbleDuration = 0.5f;
+        float wobbleFrequency = 4f;
+        float wobbleAmplitude = 15f;  
+
+        //positions
+        Vector3 endPosition = uiObject.transform.position;
+        Vector3 startPosition = new Vector3(endPosition.x, -Screen.height, endPosition.z);
+        Vector3 overshootPosition = endPosition + new Vector3(0, overshootAmount, 0);
+
+        //slide from off-screen to overshoot pos
         float time = 0f;
-        Vector3 startPosition = new Vector3(UIPrefab.transform.position.x, -Screen.height, UIPrefab.transform.position.z);
-        Vector3 endPosition = UIPrefab.transform.position;
-        while (time < duration)
+        while (time < slideDuration)
         {
-            UIPrefab.transform.position = Vector3.Lerp(startPosition, endPosition, time / duration);
             time += Time.unscaledDeltaTime;
+            float t = Mathf.Clamp01(time / slideDuration);
+
+            uiObject.transform.position = Vector3.Lerp(startPosition, overshootPosition, t);
+
             yield return null;
         }
-        UIPrefab.transform.position = endPosition;
+
+        //wobble from overshoot position down to end pos
+        time = 0f;
+        while (time < wobbleDuration)
+        {
+            time += Time.unscaledDeltaTime;
+            float t = Mathf.Clamp01(time / wobbleDuration);
+
+            //base interpolation between overshoot and end pos
+            Vector3 basePos = Vector3.Lerp(overshootPosition, endPosition, t);
+
+            //sine function wobble offset
+            float sineValue = Mathf.Sin(t * wobbleFrequency * 2f * Mathf.PI);
+            float damping = 1f - t;
+            float wobbleOffset = sineValue * wobbleAmplitude * damping;
+
+            uiObject.transform.position = basePos + new Vector3(0, wobbleOffset, 0);
+
+            yield return null;
+        }
+
+        uiObject.transform.position = endPosition;
     }
     public void ShowItemOrToolUI(PickupData uiData)
     {
         ItemOrToolUI.SetActive(true);
         bottomLeftMessage.text = uiData.bottomMessage;
         closeHintText.text = $"Q - {uiData.actionVerb}";
-        StartCoroutine(AnimatePickUpPanel(itemToolPrefab, 0.5f));
+        StartCoroutine(AnimatePickUpPanel(itemToolPrefab, 0.3f));
 
     }
     public void ShowLetterUI(PickupData uiData)
@@ -222,7 +275,7 @@ public class UIManager : MonoBehaviour
         bottomLeftMessage.text = uiData.bottomMessage;
         letterText.text = uiData.descriptionText;
         closeHintText.text = $"Q - {uiData.actionVerb}";
-        StartCoroutine(AnimatePickUpPanel(letterPrefab, 0.5f));
+        StartCoroutine(AnimatePickUpPanel(letterPrefab, 0.3f));
 
     }
     public void ShowPolaroidUI(PickupData uiData)
@@ -236,7 +289,7 @@ public class UIManager : MonoBehaviour
 
         //Vector3 startPosition = new Vector3(polaroidPrefab.transform.position.x, -Screen.height, polaroidPrefab.transform.position.z);
         //Vector3 endPosition = polaroidPrefab.transform.position;
-        StartCoroutine(AnimatePickUpPanel(polaroidPrefab, 0.5f));
+        StartCoroutine(AnimatePickUpPanel(polaroidPrefab, 0.3f));
     }
     /// <summary>
     /// the control hint shown when raycast hit interactable object
@@ -312,12 +365,14 @@ public class UIManager : MonoBehaviour
             case InventoryManager.InventoryCategory.Polaroids:
                 displayPolaroid.SetActive(true);
                 displayObjOrTool.SetActive(false);
+                StartCoroutine(AnimatePickUpPanel(displayPolaroid, 0.5f));
                 break;
 
             case InventoryManager.InventoryCategory.Items:
             case InventoryManager.InventoryCategory.Tools:
                 displayPolaroid.SetActive(false);
                 displayObjOrTool.SetActive(true);
+                StartCoroutine(AnimatePickUpPanel(displayObjOrTool, 0.5f));
                 break;
         }
 
