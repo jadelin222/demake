@@ -22,6 +22,7 @@ public class UIManager : MonoBehaviour
     public GameObject letterPrefab;
     public GameObject itemToolPrefab;
     public TMP_Text letterText;
+    public TMP_Text pageNumberText;
     public Image polaroidImage;
     public TMP_Text polaroidText;
 
@@ -74,6 +75,9 @@ public class UIManager : MonoBehaviour
     private Coroutine typewriterCoroutine;
     private float autoHideDelay = 2f; //typewriter
 
+    private List<string> letterPages = new List<string>();
+    private int currentPageIndex = 0;
+    private int wordsPerPage = 100;
 
     void Awake()
     {
@@ -105,6 +109,11 @@ public class UIManager : MonoBehaviour
         //close pick-up UI when Q is pressed
         if (pickUpMaskUI.activeSelf && Input.GetKeyDown(KeyCode.Q))
             HidePickupUI();
+        //flip pages in the letter UI
+        if (LetterUI.activeSelf && Input.GetKeyDown(KeyCode.RightArrow))
+            FlipPage(1);
+        if (LetterUI.activeSelf && Input.GetKeyDown(KeyCode.LeftArrow))
+            FlipPage(-1);
 
     }
     /// <summary>
@@ -153,7 +162,7 @@ public class UIManager : MonoBehaviour
     {
         ToolSystem.Instance.PutAwayActiveTool();
         pickUpMaskUI.SetActive(true); //bring up the UI group for pickup interaction
-
+        FreezeCamera();
         //hide all other panels
         ItemOrToolUI.SetActive(false);
         LetterUI.SetActive(false);
@@ -183,7 +192,7 @@ public class UIManager : MonoBehaviour
     {
         HideControlHintUI();
         ShowInteractableUI();
-        
+        ResumeCamera();
         pickUpMaskUI.SetActive(false);
 
         //invoke the callback to finalize pickup
@@ -273,11 +282,57 @@ public class UIManager : MonoBehaviour
     {
         LetterUI.SetActive(true);
         bottomLeftMessage.text = uiData.bottomMessage;
-        letterText.text = uiData.descriptionText;
+        //letterText.text = uiData.descriptionText;
         closeHintText.text = $"Q - {uiData.actionVerb}";
+
+        letterPages = ChopTextIntoPages(uiData.descriptionText, wordsPerPage);
+        currentPageIndex = 0;
+        DisplayCurrentPage();
         StartCoroutine(AnimatePickUpPanel(letterPrefab, 0.3f));
 
     }
+    private List<string> ChopTextIntoPages(string text, int wordsPerPage)
+    {
+        List<string> pages = new List<string>();
+        string[] words = text.Split(' ');
+        int wordCount = 0;
+        string currentPage = "";
+
+        foreach (string word in words)
+        {
+            if (wordCount + word.Length > wordsPerPage)
+            {
+                pages.Add(currentPage.Trim());
+                currentPage = "";
+                wordCount = 0;
+            }
+            currentPage += word + " ";
+            wordCount += word.Length;
+        }
+
+        if (!string.IsNullOrEmpty(currentPage.Trim()))
+        {
+            pages.Add(currentPage.Trim());
+        }
+
+        return pages;
+    }
+    private void DisplayCurrentPage()
+    {
+        if (currentPageIndex >= 0 && currentPageIndex < letterPages.Count)
+        {
+            letterText.text = letterPages[currentPageIndex];
+            pageNumberText.text = $"page {currentPageIndex + 1} / {letterPages.Count} "; 
+        }
+    }
+    private void FlipPage(int direction)
+    {
+        currentPageIndex += direction;
+        currentPageIndex = Mathf.Clamp(currentPageIndex, 0, letterPages.Count - 1);
+        DisplayCurrentPage();
+    }
+
+
     public void ShowPolaroidUI(PickupData uiData)
     {
         PolaroidUI.SetActive(true);
