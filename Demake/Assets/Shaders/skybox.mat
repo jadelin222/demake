@@ -58,8 +58,8 @@ Material:
     - _skyBlend: 1
     - _skyBtmBlend: 1
     m_Colors:
-    - _groundCol: {r: 0.08076716, g: 0.13026087, b: 0.14150941, a: 0}
+    - _groundCol: {r: 0.2774564, g: 0.38001955, b: 0.4056604, a: 0}
     - _horizonCol: {r: 0.735849, g: 0.64705884, b: 0.6910419, a: 0}
-    - _nightSkyCol: {r: 0.23584908, g: 0.107912086, b: 0.14963068, a: 0}
+    - _nightSkyCol: {r: 0.3490566, g: 0.21898362, b: 0.25963143, a: 0}
     - _skyCol: {r: 0.87058824, g: 0.99871933, b: 1, a: 0}
   m_BuildTextureStacks: []
