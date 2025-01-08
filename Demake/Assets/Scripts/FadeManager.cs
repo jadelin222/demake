@@ -26,6 +26,7 @@ public class FadeManager : MonoBehaviour
 
     private IEnumerator Fade(float targetAlpha, System.Action onComplete)
     {
+        //mask.gameObject.SetActive(true);
         float startAlpha = mask.color.a;
         float timePassed = 0f;
         while (timePassed < fadeDuration)

@@ -93,6 +93,7 @@ public class MannequinGhostAI : MonoBehaviour
         Vector3 playerPosition = player.position;
         transform.position = playerPosition + player.forward * 2f;
         transform.LookAt(player);
+        agent.isStopped = true;
 
         animator.SetTrigger("jumpScare");
 
