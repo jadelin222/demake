@@ -10,7 +10,7 @@ public class GameTime : MonoBehaviour
     public float inGameTime = 8f / 24f;
 
     [Header("Days")]
-    private string[] daysOfWeek = { "Friday", "Saturday", "Sunday" };
+    private string[] daysOfWeek = { "Friday", "Saturday", "Sunday", "Monday" };
     private int currentDayIndex = 0;
 
     void Update()
@@ -39,5 +39,16 @@ public class GameTime : MonoBehaviour
     {
         inGameTime = time;
         currentDayIndex = (currentDayIndex + 1) % daysOfWeek.Length;
+    }
+    //game over if 2 am.
+    private void CheckForLateNight()
+    {
+        float hours = inGameTime * 24f;
+        int hourInt = Mathf.FloorToInt(hours);
+
+        if (hourInt == 2)
+        {
+            GameMaster.Instance.TriggerEnding(GameMaster.Endings.StayedUpLate);
+        }
     }
 }

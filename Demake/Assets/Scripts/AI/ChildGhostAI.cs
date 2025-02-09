@@ -1,5 +1,8 @@
 using UnityEngine;
 using UnityEngine.AI;
+using static GameMaster;
+using UnityEngine.ProBuilder.Shapes;
+using System.Collections;
 
 public class ChildGhostAI : MonoBehaviour, IInteractable
 {
@@ -11,11 +14,12 @@ public class ChildGhostAI : MonoBehaviour, IInteractable
     [Header("Child Ghost Settings")]
     public ChildState currentState = ChildState.Idle;
     public Transform player;
-    public float followDistance = 2f; // Keep close to player
-    public float resumeDistance = 2.5f;        // Distance at which the ghost resumes moving
+    public float followDistance = 2f; //keep close to player
+    public float resumeDistance = 2.5f;        //distance at which the girl npc resumes moving
     public float lookAtSpeed = 2f;
     public Transform destinationPoint;
     public Animator animator;
+    public Dooor door;
 
     private NavMeshAgent agent;
 
@@ -27,13 +31,13 @@ public class ChildGhostAI : MonoBehaviour, IInteractable
     private void Update()
     {
         if (currentState == ChildState.Leading)
-        {
             HandleLeadingBehavior();
-        }
         else if (currentState == ChildState.WaitingForPlayer)
-        {
             HandleWaitingBehavior();
-        }
+        //if the npc girl has reached the destination
+        if (currentState == ChildState.Leading && !agent.pathPending && agent.remainingDistance <= agent.stoppingDistance)
+            if (!agent.hasPath || agent.velocity.sqrMagnitude == 0f)
+                OnReachedDestination();
     }
     public void Interact()
     {
@@ -48,7 +52,7 @@ public class ChildGhostAI : MonoBehaviour, IInteractable
         else if(currentState == ChildState.WaitingForItem && !hasRequiredItem)
         {
             animator.SetTrigger("isSitSpeaking");
-            UIManager.Instance.ShowBottomScreenUI("Bring me the thing please");
+            UIManager.Instance.ShowBottomScreenUI("Bring me the candy please");
         }
         if (currentState == ChildState.WaitingForItem && hasRequiredItem)
         {
@@ -64,7 +68,9 @@ public class ChildGhostAI : MonoBehaviour, IInteractable
     private void LeadWay()
     {
         agent.isStopped = false;
+        animator.ResetTrigger("isSitSpeaking");
         animator.SetTrigger("StandNWalk");
+        Debug.Log("StandNWalk trigger set");
         //animation td
         agent.SetDestination(destinationPoint.position);
         PlayWalkAnimation();
@@ -85,6 +91,7 @@ public class ChildGhostAI : MonoBehaviour, IInteractable
     {
         currentState = ChildState.WaitingForPlayer;
         animator.SetTrigger("StandWaiting");
+        Debug.Log("StandWaiting trigger set");
         agent.isStopped = true;
         PlayWaitingAnimation();
     }
@@ -101,6 +108,7 @@ public class ChildGhostAI : MonoBehaviour, IInteractable
     private void ResumeLeading()
     {
         currentState = ChildState.Leading;
+        animator.SetTrigger("StandNWalk");
         agent.isStopped = false;
         PlayWalkAnimation();
     }
@@ -121,5 +129,21 @@ public class ChildGhostAI : MonoBehaviour, IInteractable
     {
         //keep walking
         Debug.Log("Walking");   
+    }
+    private void OnReachedDestination()
+    {
+        animator.SetTrigger("StandWaiting");
+        //open door
+        if (door != null)
+            door.OpenDoor();
+        //UIManager.Instance.ShowBottomScreenUI("You are free to go now");
+        //trigger the end screen
+        StartCoroutine(TriggerEndScreenAfterDelay(1.5f));
+        
+    }
+    private IEnumerator TriggerEndScreenAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        GameMaster.Instance.TriggerEnding(Endings.Win);
     }
 }

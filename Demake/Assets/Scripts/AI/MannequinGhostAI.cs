@@ -13,6 +13,8 @@ public class MannequinGhostAI : MonoBehaviour
     public float chaseDistance = 20f;      
     public float stopChaseDistance = 30f;
     public Animator animator;
+    public AudioSource audioSource;
+    public AudioClip jumpScareSound;
 
     private NavMeshAgent agent;
     private bool isIdleLocked = false;
@@ -94,6 +96,12 @@ public class MannequinGhostAI : MonoBehaviour
         transform.position = playerPosition + player.forward * 2f;
         transform.LookAt(player);
         agent.isStopped = true;
+
+        //play jump scare sound
+        if (audioSource != null && jumpScareSound != null)
+        {
+            audioSource.PlayOneShot(jumpScareSound);
+        }
 
         animator.SetTrigger("jumpScare");
 

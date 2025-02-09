@@ -26,6 +26,7 @@ public class ToolPickUp : PickUp
         //add the tool to the ToolSystem when q presed
         if (toolObject != null)
         {
+            toolObject.SetActive(true);
             ToolSystem.Instance.CollectTool(toolObject, image, descriptionText);
             ToolData toolData = new ToolData(toolObject.name, image, descriptionText);
             InventoryManager.Instance.AddTool(toolData);

@@ -75,6 +75,14 @@ public abstract class Tool : MonoBehaviour
    
     public virtual void PutAway()
     {
+        //isHiding = true;
+        //StartCoroutine(PlayHideAnimation());
+        if (!gameObject.activeInHierarchy)
+        {
+            Debug.LogWarning("cant start coroutine because thingy is inactive");
+            return;
+        }
+
         isHiding = true;
         StartCoroutine(PlayHideAnimation());
     }

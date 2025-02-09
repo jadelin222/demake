@@ -4,6 +4,7 @@ public abstract class PickUp : MonoBehaviour, IInteractable
 {
     public string itemName;
     public PickupDisplayType displayType;
+    [TextAreaAttribute]
     public string descriptionText;
     public Sprite image;
     public ItemType RequiredItem => ItemType.None;
@@ -12,7 +13,7 @@ public abstract class PickUp : MonoBehaviour, IInteractable
     public abstract void Interact();
     public virtual void FinalizePickup()
     {
-        //destroy the pickup object
+        //destroy the pickup object prop (in scene)
         Destroy(gameObject);
     }
     public void OnRayHit()

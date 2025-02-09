@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class Waterable : MonoBehaviour, IInteractable
 {
@@ -61,6 +62,32 @@ public class Waterable : MonoBehaviour, IInteractable
 
         rottenObject.SetActive(false);
         revivedObject.SetActive(true);
+        StartCoroutine(WobbleEffect(revivedObject.transform));
+    }
+    //animate the revived object 
+    private IEnumerator WobbleEffect(Transform target)
+    {
+        float duration = 0.75f;
+        float elapsedTime = 0f;
+        Vector3 originalScale = target.localScale;
+        Vector3 targetScale = originalScale * 1.2f;
 
+        while (elapsedTime < duration)
+        {
+            //PingPong returns a value that increments and decrements between zero and the length
+            //float t = Mathf.PingPong(elapsedTime * 2f, 1f);
+            float t = elapsedTime / duration;
+            float easedT = EaseInOutQuad(t);
+            float pingPongT = Mathf.PingPong(easedT * 2f, 1f);
+            target.localScale = Vector3.Lerp(originalScale, targetScale, t);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        target.localScale = originalScale;
+    }
+    private float EaseInOutQuad(float t)
+    {
+        return t < 0.5f ? 2f * t * t : -1f + (4f - 2f * t) * t;
     }
 }

@@ -66,7 +66,7 @@ public class Dooor : MonoBehaviour, IInteractable
         UIManager.Instance.ShowControlHintUI(InteractionVerb);
     }
 
-    private void OpenDoor()
+    public void OpenDoor()
     {
         if (!isOpen)
         {

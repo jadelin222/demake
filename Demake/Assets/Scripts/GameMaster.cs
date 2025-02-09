@@ -10,6 +10,7 @@ public class GameMaster : MonoBehaviour
     {
         CaughtByGhosts,
         CutTooManyFlowers,
+        StayedUpLate,
         Win
     }
     public static GameMaster Instance;
@@ -40,9 +41,10 @@ public class GameMaster : MonoBehaviour
 
         string message = ending switch
         {
-            Endings.CaughtByGhosts => "Game Over, You were caught by ghosts. Hahahaha. Press Q to Restart",
-            Endings.CutTooManyFlowers => "Game Over, You cut too many flowers. Hahahaha! Press Q to Restart",
-            Endings.Win => "You Win! Congratulations! Press Q to Restart",
+            Endings.CaughtByGhosts => "Game Over, You soul was consumed by the ghosts of the past. Press Q to Restart",
+            Endings.CutTooManyFlowers => "Game Over, You cut too many flowers. The underworld is angry at what you did. Press Q to Restart",
+            Endings.StayedUpLate => "Game Over, you've made a terrible mistake to stay up late. The mall has consumed your soul. Press Q to Restart",
+            Endings.Win => "You find your way out of the mall. Now you don't need to die. Press Q to Restart",
             _ => "Game Over"
         };
 
