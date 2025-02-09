@@ -20,6 +20,8 @@ public abstract class Tool : MonoBehaviour
     [Header("Animation Settings")]
     public Animator animator;
     public Animator HideNShowAnimator;
+    public AnimationCurve showHideCurve;
+    public AnimationCurve useToolCurve;
 
     public float maxIdleTime = 5f;
     public float coolDownTime = 1f;
@@ -33,12 +35,19 @@ public abstract class Tool : MonoBehaviour
     //public void ActivateTool(bool hitValidTarget)
     public void ActivateTool()
     {
+        Debug.Log($"Attempting to activate tool: {toolName}");
         //cooldown check
         if (!CanUse())
+        {
+            Debug.Log("Tool is on cooldown.");
             return;
+        }
         if (currentState == ToolState.InUse)
+        {
+            Debug.Log("Tool is already in use.");
             return;
-
+        }
+        Debug.Log("Tool activated.");
         PlayHitAnim();
         PlayHitSound();
         UseTool();
@@ -71,8 +80,13 @@ public abstract class Tool : MonoBehaviour
         isHiding = false;
         lastUseTime = Time.time; //idle time reset
         ShowTool();
+        StartCoroutine(SetToIdleAfterDelay(0.2f));
     }
-   
+    private IEnumerator SetToIdleAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        SetState(ToolState.Idle);
+    }
     public virtual void PutAway()
     {
         //isHiding = true;
@@ -91,13 +105,18 @@ public abstract class Tool : MonoBehaviour
         //td: add condition to use on correct object?
         return Time.time >= lastUseTime + coolDownTime;
     }
-    private void ResetStateToIdle() //event attached to end of tool use animation
+    public void ResetStateToIdle() //event attached to end of tool use animation
     {
         SetState(ToolState.Idle);
+    }
+    public bool IsInUse()
+    {
+        return currentState == ToolState.InUse;
     }
 
     protected virtual void ShowTool()
     {
+        if (isHiding) return;
         //play anim
         HideNShowAnimator.SetTrigger("ShowTool");
         gameObject.SetActive(true);
@@ -110,7 +129,24 @@ public abstract class Tool : MonoBehaviour
         {
             animator.SetBool("IsIdle", false);
             SetState(ToolState.InUse);
+            StartCoroutine(AnimateToolUse());
         }
+    }
+    private IEnumerator AnimateToolUse()
+    {
+        float duration = 1f; //duration of the tool use animation
+        float elapsedTime = 0f;
+        while (elapsedTime < duration)
+        {
+            float t = elapsedTime / duration;
+            float curveValue = useToolCurve.Evaluate(t);
+            animator.speed = curveValue;
+
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        animator.speed = 1f; 
     }
     protected void PlayHideAnim()
     {
@@ -119,8 +155,21 @@ public abstract class Tool : MonoBehaviour
     private IEnumerator PlayHideAnimation()
     {
         PlayHideAnim();
-        yield return new WaitForSeconds(2f);
+        float duration = 2f; //duration of the hide animation
+        float elapsedTime = 0f;
+        while (elapsedTime < duration)
+        {
+            float t = elapsedTime / duration;
+            float curveValue = showHideCurve.Evaluate(t);
+            HideNShowAnimator.speed = curveValue;
+
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
         gameObject.SetActive(false);
+        //yield return new WaitForSeconds(2f);
+        //gameObject.SetActive(false);
     }
     protected void PlayHitSound()
     {

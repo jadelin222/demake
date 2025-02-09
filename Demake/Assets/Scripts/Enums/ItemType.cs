@@ -7,8 +7,10 @@ public enum ItemType
     WateringCan,
     Scissors,
     Trumpet,
-    KeyToA,         
-    KeyToB,
+    MallKey,
+    CEOKey,
+    //KeyToA,         
+    //KeyToB,
     DoorKnob,
     Candy
 }

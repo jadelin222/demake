@@ -68,7 +68,7 @@ public class ToolSystem : MonoBehaviour
         activeTool = toolInventory[currentToolIndex];
         equippedItem = activeTool.ToolType;  //update current equipped tool
         activeTool.ResetToolStatus();
-        Debug.Log($"{activeTool.ToolType} equipped");
+        //Debug.Log($"{activeTool.ToolType} equipped");
         //show animator
 
     }
@@ -107,6 +107,11 @@ public class ToolSystem : MonoBehaviour
     public void CycleToNextTool()
     {
         if (toolInventory.Count == 0) return;
+        if (activeTool != null && activeTool.IsInUse())
+        {
+            Debug.Log("cant cycle to next tool while the current tool is in use");
+            return;
+        }
         currentToolIndex = (currentToolIndex + 1) % toolInventory.Count;
         EquipTool(currentToolIndex);
         //ad animation

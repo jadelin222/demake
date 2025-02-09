@@ -16,6 +16,7 @@ public class Dooor : MonoBehaviour, IInteractable
     [Header("Animation and Sound")]
     private Animator animator;
     private AudioSource audioSource;
+    public AnimationCurve doorCurve;
 
     public AudioClip doorOpenSound;
     public AudioClip doorLockedSound;
@@ -62,7 +63,7 @@ public class Dooor : MonoBehaviour, IInteractable
     //called when the player looks at the door
     public void OnRayHit()
     {
-        Debug.Log("looking at door");
+        //Debug.Log("looking at door");
         UIManager.Instance.ShowControlHintUI(InteractionVerb);
     }
 
@@ -71,8 +72,9 @@ public class Dooor : MonoBehaviour, IInteractable
         if (!isOpen)
         {
             isOpen = true;
-            Debug.Log("door opened");
-            PlayOpenAnim();
+            //Debug.Log("door opened");
+            StartCoroutine(PlayOpenAnim());
+            //PlayOpenAnim();
             PlayOpenSound();
             
         }  
@@ -89,11 +91,28 @@ public class Dooor : MonoBehaviour, IInteractable
             //td:anim door
         }
     }
-
-    private void PlayOpenAnim()
+    private IEnumerator PlayOpenAnim()
     {
         animator.SetTrigger("Open");
+        float duration = 2f; // Duration of the open animation
+        float elapsedTime = 0f;
+
+        while (elapsedTime < duration)
+        {
+            float t = elapsedTime / duration;
+            float curveValue = doorCurve.Evaluate(t);
+            animator.speed = curveValue;
+
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        animator.speed = 1f; // Reset the animation speed
     }
+    //private void PlayOpenAnim()
+    //{
+    //    animator.SetTrigger("Open");
+    //}
     private void PlayOpenSound()
     {
         //Debug.Log("playing open sound");
@@ -129,6 +148,6 @@ public class Dooor : MonoBehaviour, IInteractable
     }
     private void PlayCloseSound()
     {
-        Debug.Log("play close sound");
+        //Debug.Log("play close sound");
     }
 }

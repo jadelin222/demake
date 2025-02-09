@@ -6,6 +6,7 @@ public class Hammer : Tool
 {
     public override void UseTool()
     {
+        //
     }
     private void HitStuff()
     {

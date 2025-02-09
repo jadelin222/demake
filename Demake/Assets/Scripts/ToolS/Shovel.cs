@@ -6,10 +6,10 @@ public class Shovel : Tool
 {
     public override void UseTool()
     {
-        DigThings();
+        //DigThings();
     }
     private void DigThings()
     {
-        Debug.Log("im digging it!");
+        //Debug.Log("im digging it!");
     }
 }

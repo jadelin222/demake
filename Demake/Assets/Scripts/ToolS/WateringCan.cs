@@ -5,11 +5,11 @@ public class WateringCan : Tool
 {
     public override void UseTool()
     {
-        Debug.Log("watering plants...gluc gluc");
-        WaterPlants();
+        //Debug.Log("watering plants...gluc gluc");
+        //WaterPlants();
     }
     private void WaterPlants()
     {
-        Debug.Log("plants revived!");
+        //Debug.Log("plants revived!");
     }
 }

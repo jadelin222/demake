@@ -72,7 +72,8 @@ public class CameraRayInteracter : MonoBehaviour
         }
         else if (interactable.RequiredItem != ItemType.None)
         {
-            Debug.Log($"you need a {interactable.RequiredItem} equipped to use this tool.");
+
+            //Debug.Log($"you need a {interactable.RequiredItem} equipped to use this tool.");
             //td: prompt bottom screen ui'
         }
     }
