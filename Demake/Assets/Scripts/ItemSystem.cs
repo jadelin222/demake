@@ -16,7 +16,7 @@ public class ItemSystem : MonoBehaviour
     {
         ItemData newItem = new ItemData(image, description, type);
         itemCollection.Add(newItem);
-        Debug.Log($"Collected Item: {description}");
+        //Debug.Log($"Collected Item: {description}");
     }
     public List<ItemData> GetItemCollection()
     {

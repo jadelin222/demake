@@ -30,7 +30,6 @@ public class GrassRenderer : MonoBehaviour
     [Header("Particle Effect")]
     public GameObject cutEffectPrefab;
     public GameObject groundEffectPrefab;
-    private List<ParticleSystem> activeParticles = new List<ParticleSystem>();
     private Queue<GameObject> cutEffectPool = new Queue<GameObject>(); //pooling for cut effects
     private Queue<GameObject> groundEffectPool = new Queue<GameObject>(); //pooling for ground effect
 

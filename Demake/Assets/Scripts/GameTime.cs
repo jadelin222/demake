@@ -15,7 +15,6 @@ public class GameTime : MonoBehaviour
 
     void Update()
     {
-        //timeTxt.text = GetTime();
         inGameTime += Time.deltaTime / dayLength;
         if (inGameTime >= 1)
         {

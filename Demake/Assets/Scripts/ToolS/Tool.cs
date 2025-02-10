@@ -35,19 +35,19 @@ public abstract class Tool : MonoBehaviour
     //public void ActivateTool(bool hitValidTarget)
     public void ActivateTool()
     {
-        Debug.Log($"Attempting to activate tool: {toolName}");
+        //Debug.Log($"Attempting to activate tool: {toolName}");
         //cooldown check
         if (!CanUse())
         {
-            Debug.Log("Tool is on cooldown.");
+            //Debug.Log("Tool is on cooldown.");
             return;
         }
         if (currentState == ToolState.InUse)
         {
-            Debug.Log("Tool is already in use.");
+            //Debug.Log("Tool is already in use.");
             return;
         }
-        Debug.Log("Tool activated.");
+        //Debug.Log("Tool activated.");
         PlayHitAnim();
         PlayHitSound();
         UseTool();

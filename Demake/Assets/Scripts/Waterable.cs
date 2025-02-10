@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 public class Waterable : MonoBehaviour, IInteractable
 {
@@ -11,6 +10,8 @@ public class Waterable : MonoBehaviour, IInteractable
     public AudioClip waterSound;
     public ItemType RequiredItem => ItemType.WateringCan;
     public string InteractionVerb => "Insppect";
+    [Header("Animation Settings")]
+    public AnimationCurve wobbleCurve;
 
     [SerializeField]
     private GameObject rottenObject;
@@ -67,7 +68,7 @@ public class Waterable : MonoBehaviour, IInteractable
     //animate the revived object 
     private IEnumerator WobbleEffect(Transform target)
     {
-        float duration = 0.75f;
+        float duration = 0.55f;
         float elapsedTime = 0f;
         Vector3 originalScale = target.localScale;
         Vector3 targetScale = originalScale * 1.2f;
@@ -77,17 +78,13 @@ public class Waterable : MonoBehaviour, IInteractable
             //PingPong returns a value that increments and decrements between zero and the length
             //float t = Mathf.PingPong(elapsedTime * 2f, 1f);
             float t = elapsedTime / duration;
-            float easedT = EaseInOutQuad(t);
-            float pingPongT = Mathf.PingPong(easedT * 2f, 1f);
-            target.localScale = Vector3.Lerp(originalScale, targetScale, t);
+            float curveValue = wobbleCurve.Evaluate(t);
+            target.localScale = Vector3.Lerp(originalScale, targetScale, curveValue);
             elapsedTime += Time.deltaTime;
             yield return null;
         }
 
         target.localScale = originalScale;
     }
-    private float EaseInOutQuad(float t)
-    {
-        return t < 0.5f ? 2f * t * t : -1f + (4f - 2f * t) * t;
-    }
+
 }

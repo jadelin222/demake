@@ -109,10 +109,6 @@ public class Dooor : MonoBehaviour, IInteractable
 
         animator.speed = 1f; // Reset the animation speed
     }
-    //private void PlayOpenAnim()
-    //{
-    //    animator.SetTrigger("Open");
-    //}
     private void PlayOpenSound()
     {
         //Debug.Log("playing open sound");

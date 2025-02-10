@@ -1477,6 +1477,39 @@ MonoBehaviour:
   waterParticleEffect: {fileID: 0}
   audioSource: {fileID: 170466378231964259}
   waterSound: {fileID: 8300000, guid: 005ddb6fef5030c4997034e46f92b0c3, type: 3}
+  wobbleCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 2
+      outSlope: 2
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.16129349
+      value: 0.531313
+      inSlope: 1.5440795
+      outSlope: 1.5440795
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
   rottenObject: {fileID: 4051421129557514448}
   revivedObject: {fileID: 8373388036190336821}
 --- !u!82 &170466378231964259

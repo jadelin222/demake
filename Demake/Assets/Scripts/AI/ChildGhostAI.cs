@@ -70,7 +70,7 @@ public class ChildGhostAI : MonoBehaviour, IInteractable
         agent.isStopped = false;
         animator.ResetTrigger("isSitSpeaking");
         animator.SetTrigger("StandNWalk");
-        Debug.Log("StandNWalk trigger set");
+        //Debug.Log("StandNWalk trigger set");
         //animation td
         agent.SetDestination(destinationPoint.position);
         PlayWalkAnimation();
@@ -91,7 +91,7 @@ public class ChildGhostAI : MonoBehaviour, IInteractable
     {
         currentState = ChildState.WaitingForPlayer;
         animator.SetTrigger("StandWaiting");
-        Debug.Log("StandWaiting trigger set");
+        //Debug.Log("StandWaiting trigger set");
         agent.isStopped = true;
         PlayWaitingAnimation();
     }

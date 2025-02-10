@@ -7,7 +7,7 @@ public class TextPickUP : PickUp
     public override string InteractionVerb => "Inspect";
     public override void Interact()
     {
-        Debug.Log($"looking at note x");
+        //Debug.Log($"looking at note x");
 
         var uiData = new PickupData
             (PickupDisplayType.Letter,
