@@ -21,6 +21,7 @@ public class GameTime : MonoBehaviour
             inGameTime = 0;
             currentDayIndex = (currentDayIndex + 1) % daysOfWeek.Length;
         }
+        CheckForLateNight();
 
     }
     public string GetTime()
@@ -29,6 +30,7 @@ public class GameTime : MonoBehaviour
         int hourInt = Mathf.FloorToInt(hours);
         int minutes = Mathf.FloorToInt((hours - hourInt) * 60);
         return $"{hourInt:D2}:{minutes:D2}";
+
     }
     public string GetDay()
     {
